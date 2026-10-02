@@ -3,14 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#1b47f5">
+<meta name="theme-color" content="#19647e">
+<meta name="description" content="Produtos de limpeza com entrega grátis nos bairros próximos. Faça seu pedido online na Aroma e Brilho.">
+<meta property="og:type" content="website"><meta property="og:site_name" content="Aroma e Brilho"><meta property="og:locale" content="pt_BR">
+<meta property="og:title" content="Aroma e Brilho | Limpeza &amp; Harmonia"><meta property="og:description" content="Produtos de limpeza com entrega grátis no seu bairro. Faça seu pedido online.">
+<meta property="og:url" content="https://SEU-USUARIO.github.io/SEU-REPOSITORIO/"><meta property="og:image" content="https://SEU-USUARIO.github.io/SEU-REPOSITORIO/og.jpg">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image">
 <link rel="icon" type="image/png" href="favicon.png"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-192.png">
 <meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Aroma e Brilho">
 <title>Aroma e Brilho | Produtos de limpeza com entrega grátis</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&display=swap">
 <style>
-:root{--azul:#1b47f5;--azul2:#0f2fb8;--ink:#0e1a3a;--bg:#f2f5ff;--sf:#fff;--lim:#ffe24a;--mut:#5b6787;--bd:#dde3f5;--ok:#0b8a5f;--red:#d63b40;--wa:#128c4a;color-scheme:light}
+:root{--azul:#19647e;--azul2:#0f4a60;--ink:#0b2f40;--bg:#eef8fb;--sf:#fff;--lim:#f0c85a;--mut:#55707c;--bd:#d3e6ee;--ok:#0b7f5a;--red:#c9363b;--wa:#128c4a;color-scheme:light}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:Figtree,system-ui,sans-serif;line-height:1.45;padding-bottom:90px}
@@ -49,9 +54,9 @@ textarea{resize:none}
 .sec{margin:22px 0 8px;display:flex;align-items:baseline;gap:10px}
 .sec h2{margin:0;font-size:1.5rem;letter-spacing:-.02em}.sec span{color:var(--mut);font-size:.88rem}
 .list{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(min(100%,330px),1fr))}
-.it{background:var(--sf);border:1.5px solid var(--bd);border-radius:18px;padding:12px;display:grid;grid-template-columns:64px 1fr auto;gap:12px;align-items:center}
+.it{background:var(--sf);border:1.5px solid var(--bd);border-radius:18px;padding:12px;display:grid;grid-template-columns:76px 1fr auto;gap:12px;align-items:center}
 .it.off{opacity:.62}
-.ph{width:64px;height:64px;border-radius:16px;background:var(--c);display:grid;place-items:center;font-size:1.9rem}
+.ph{width:76px;height:76px;overflow:hidden;border-radius:16px;background:var(--c);display:grid;place-items:center;font-size:1.9rem}
 .bd h3{margin:0;font-size:1.05rem;letter-spacing:-.01em}
 .sz{display:flex;gap:4px;margin:6px 0 2px}
 .sz button{padding:3px 11px;border-radius:99px;border:1.5px solid var(--bd);font-size:.8rem;font-weight:600}
@@ -73,7 +78,7 @@ textarea{resize:none}
 .sk{height:92px;border-radius:18px;background:linear-gradient(90deg,var(--sf) 25%,var(--bd) 50%,var(--sf) 75%);background-size:200% 100%;animation:sh 1.2s linear infinite}
 .empty{color:var(--mut);text-align:center;padding:26px 8px}
 /* pedido */
-#ov{position:fixed;inset:0;background:rgba(14,26,58,.5);opacity:0;pointer-events:none;transition:.3s;z-index:30}
+#ov{position:fixed;inset:0;background:rgba(11,47,64,.5);opacity:0;pointer-events:none;transition:.3s;z-index:30}
 #dr{position:fixed;left:0;right:0;bottom:0;max-height:92dvh;overflow:auto;background:var(--sf);border-radius:26px 26px 0 0;padding:18px 18px calc(22px + env(safe-area-inset-bottom,0px));z-index:31;transform:translateY(105%);transition:transform .4s cubic-bezier(.2,.8,.2,1);display:flex;flex-direction:column;gap:10px}
 .open#ov{opacity:1;pointer-events:auto}.open#dr{transform:none}
 .dh{display:flex;justify-content:space-between;align-items:center}
@@ -97,7 +102,7 @@ textarea{resize:none}
 .wa{display:block;text-align:center;background:var(--wa);color:#fff;font-weight:700;padding:11px;border-radius:12px;text-decoration:none}
 .tkr{display:grid;gap:4px}.send:disabled{opacity:.6}
 .fb button.cp{width:100%;padding:10px;border-radius:12px;background:var(--ink);color:#fff;font-weight:600}
-#fab{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:25;width:min(560px,calc(100% - 28px));display:none;justify-content:space-between;align-items:center;background:var(--ink);color:#fff;padding:14px 20px;border-radius:99px;font-weight:700;box-shadow:0 10px 30px rgba(14,26,58,.35)}
+#fab{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:25;width:min(560px,calc(100% - 28px));display:none;justify-content:space-between;align-items:center;background:var(--ink);color:#fff;padding:14px 20px;border-radius:99px;font-weight:700;box-shadow:0 10px 30px rgba(11,47,64,.35)}
 #fab.show{display:flex}#fab.bump{animation:bump .35s}
 #fab span{background:var(--lim);color:var(--ink);border-radius:99px;padding:2px 12px}
 .toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translate(-50%,16px);background:var(--ink);color:#fff;padding:10px 18px;border-radius:12px;opacity:0;transition:.3s;z-index:40;font-size:.88rem;pointer-events:none;white-space:nowrap}
@@ -108,6 +113,11 @@ textarea{resize:none}
 .loja a{padding:11px 18px;border-radius:99px;font-weight:700;text-decoration:none;background:var(--lim);color:var(--ink)}
 .loja a.g{background:transparent;color:#fff;border:2px solid rgba(255,255,255,.55)}
 footer{text-align:center;color:var(--mut);padding:8px 0 24px;font-size:.82rem}
+[hidden]{display:none!important}
+.ph img{width:100%;height:100%;object-fit:cover;border-radius:16px}.ph img.art{width:82%;height:82%;object-fit:contain}
+.aberto{display:inline-flex;align-items:center;gap:8px;margin:12px 0 0 10px;font-weight:600;font-size:.92rem;background:rgba(255,255,255,.16);padding:8px 14px;border-radius:99px;animation:fade .8s .9s backwards}
+.aberto:before{content:"";width:9px;height:9px;border-radius:50%;background:#ff8a80}.aberto.on:before{background:#6ee7a8;box-shadow:0 0 0 4px rgba(110,231,168,.25)}
+.aviso{margin:0;background:#fff6d6;border:1.5px solid var(--lim);border-radius:12px;padding:10px 12px;font-size:.88rem;font-weight:600}
 @media(min-width:960px){
  body{padding-bottom:0}
  .cols{display:grid;grid-template-columns:1fr 390px;gap:30px;align-items:start}
@@ -134,7 +144,7 @@ footer{text-align:center;color:var(--mut);padding:8px 0 24px;font-size:.82rem}
 <section class="hero"><div>
   <h1><span><i>Tudo pra limpar</i></span><span><i>a casa, entregue</i></span><span><i>no seu bairro.</i></span></h1>
   <p>Escolha os produtos, faça o pedido aqui mesmo e pague na entrega em dinheiro ou Pix.</p>
-  <div class="tag">Entrega grátis nos bairros próximos</div>
+  <div class="tag">Entrega grátis nos bairros próximos</div><div class="aberto" id="ab" hidden></div>
   <img class="hl" src="logo.png" alt="Selo Aroma e Brilho, limpeza e harmonia">
 </div></section>
 <div class="wrap"><div class="cols">
@@ -148,8 +158,8 @@ footer{text-align:center;color:var(--mut);padding:8px 0 24px;font-size:.82rem}
     <div class="dh"><h2>Seu pedido</h2><button class="x" id="fch" aria-label="Fechar">✕</button></div>
     <div id="trk"></div><div id="cart"></div>
     <div class="sm"><span>Itens (<span id="nq">0</span>)</span><span id="sb"></span></div>
-    <div class="sm"><span>Entrega</span><span class="g" id="ent">Grátis*</span></div>
-    <p class="info">*Nos bairros próximos. A loja confirma o endereço.</p>
+    <div class="sm"><span>Entrega</span><span class="g" id="ent">Grátis</span></div>
+    <p class="info" id="entinfo">Entrega grátis.</p><p class="aviso" id="aviso" hidden></p>
     <div class="tt"><span>Total</span><span id="tot"></span></div>
     <div class="fm">
       <h3>Entrega</h3>
@@ -170,7 +180,7 @@ footer{text-align:center;color:var(--mut);padding:8px 0 24px;font-size:.82rem}
 <footer>Aroma e Brilho © 2026</footer></div>
 <button id="fab"></button>
 <script>
-const ZAP="5585985441124",COR=["#dbe6ff","#fff1a8","#d3f4e4","#ffdcd6"];
+const ZAP="5585985441124",COR=["#d9eefa","#fbeec0","#d4f1e6","#fde0d6"];
 let D={loja:{},cats:[],produtos:[]},ok=false,cat="Todos",busca="",carrinho={},sel={},ult="";
 let cli={nome:"",tel:"",bairro:"",rua:"",pag:"Dinheiro",troco:"",obs:""};
 try{carrinho=JSON.parse(localStorage.getItem("aromaebrilho_carrinho"))||{}}catch(e){}
@@ -191,7 +201,7 @@ function item(p,n){
   const st=out?["out","Esgotado"]:e<=5?["low","Restam "+e]:["","Em estoque: "+e];
   const sz=p.vars.length>1?`<div class="sz">${p.vars.map((x,j)=>`<button class="${j===i?"on":""}" onclick="sel[${p.id}]=${j};grid()">${esc(x.t)}</button>`).join("")}</div>`:(v.t?`<div class="sz2">${esc(v.t)}</div>`:"");
   const ctl=out?`<span class="es">Esgotado</span>`:q?`<div class="stp"><button onclick="mudar('${k}',-1)" aria-label="Menos">−</button><b>${q}</b><button onclick="mudar('${k}',1)" ${q>=e?"disabled":""} aria-label="Mais">+</button></div>`:`<button class="add" onclick="mudar('${k}',1)">Adicionar</button>`;
-  return `<article class="it ${out?"off":""}"><div class="ph" style="--c:${COR[n%COR.length]}">${esc(p.ico||"🧴")}</div>
+  return `<article class="it ${out?"off":""}"><div class="ph" style="--c:${COR[n%COR.length]}">${p.foto?`<img src="${esc(p.foto)}" alt="" loading="lazy">`:`<img class="art" src="${arte(p)}" alt="">`}</div>
   <div class="bd"><h3>${esc(p.nome)}</h3>${sz}<p class="st ${st[0]}">${st[1]}</p></div>
   <div class="rt ${ult===k?"fresh":""}"><div class="pt"><small>R$</small>${num(v.p)}</div>${ctl}</div></article>`;
 }
@@ -223,9 +233,9 @@ function linhas(){
   return o;
 }
 function cartView(){
-  const ls=linhas(),tot=ls.reduce((s,l)=>s+l.sub,0),n=ls.reduce((s,l)=>s+l.q,0);
+  const ls=linhas(),sub=ls.reduce((s,l)=>s+l.sub,0),ent=ls.length?taxaEnt():0,tot=sub+ent,n=ls.reduce((s,l)=>s+l.q,0);
   $("cart").innerHTML=ls.length?ls.map(l=>`<div class="ci"><div>${esc(l.nome)}<small>${brl(l.p)} cada</small></div><div class="stp"><button onclick="mudar('${l.k}',-1)" aria-label="Menos">−</button><b>${l.q}</b><button onclick="mudar('${l.k}',1)" aria-label="Mais">+</button></div><b>${brl(l.sub)}</b></div>`).join(""):`<p class="empty">Seu pedido está vazio. Toque em Adicionar nos produtos.</p>`;
-  $("tot").textContent=brl(tot);$("nq").textContent=n;$("sb").textContent=brl(tot);
+  $("tot").textContent=brl(tot);$("nq").textContent=n;$("sb").textContent=brl(sub);entView(ent);
   const f=$("fab"),tk=trk&&trk.status!=="entregue"&&trk.status!=="cancelado";f.innerHTML=n?`<span>${n}</span>Ver pedido<b>${brl(tot)}</b>`:(tk?`Acompanhar pedido ${esc(trk.codigo)}<b>${ST[trk.status]}</b>`:"");f.classList.toggle("show",n>0||!!tk);repView();
 }
 function toast(t){let e=$("toast");if(!e){e=document.createElement("div");e.id="toast";e.className="toast";e.setAttribute("role","status");document.body.appendChild(e)}e.textContent=t;e.classList.add("on");clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove("on"),1400)}
@@ -234,18 +244,19 @@ function pagVis(){document.querySelectorAll("#pg button").forEach(b=>b.classList
 const ST={novo:"Recebido",confirmado:"Confirmado",entrega:"A caminho",entregue:"Entregue",cancelado:"Cancelado"};
 let trk=null,enviando=false;
 const err=t=>{$("err").textContent=t};
-function texto(o){return "*Pedido "+o.codigo+" - Aroma e Brilho*\n\n"+o.itens.map(i=>`${i.q}x ${i.nome} - ${brl(i.q*i.p)}`).join("\n")+"\n*Total: "+brl(o.total)+"*\n\n*Cliente:* "+o.cliente.nome+"\n*Bairro:* "+o.cliente.bairro+"\n*Endereço:* "+o.cliente.rua+"\n*Pagamento:* "+o.pag+(o.troco?" - troco para "+brl(o.troco):"")+(o.obs?"\n*Obs:* "+o.obs:"")}
+function texto(o){return "*Pedido "+o.codigo+" - Aroma e Brilho*\n\n"+o.itens.map(i=>`${i.q}x ${i.nome} - ${brl(i.q*i.p)}`).join("\n")+(o.entrega?"\nEntrega: "+brl(o.entrega):"")+"\n*Total: "+brl(o.total)+"*\n\n*Cliente:* "+o.cliente.nome+"\n*Bairro:* "+o.cliente.bairro+"\n*Endereço:* "+o.cliente.rua+"\n*Pagamento:* "+o.pag+(o.troco?" - troco para "+brl(o.troco):"")+(o.obs?"\n*Obs:* "+o.obs:"")}
 async function enviar(){
   if(enviando||$("c_site").value)return;
   let ce=0;try{ce=+localStorage.getItem("aromaebrilho_envio")||0}catch(e){}
   if(Date.now()-ce<60000){err("Você acabou de enviar um pedido. Aguarde um minuto para enviar outro.");return}
+  const ab0=abertura();if(ab0&&ab0.bloq){err("A loja está fechada temporariamente. Tente mais tarde.");return}
   const ls=linhas();if(!ls.length){err("Adicione pelo menos um produto.");return}
-  const tot=ls.reduce((x,l)=>x+l.sub,0),tel=String(cli.tel).replace(/\D/g,"");
+  const sub=ls.reduce((x,l)=>x+l.sub,0),ent=taxaEnt(),tot=sub+ent,tel=String(cli.tel).replace(/\D/g,"");
   if(!cli.nome.trim()||!cli.bairro.trim()||!cli.rua.trim()){err("Preencha nome, bairro e rua com número.");return}
   if(tel.length<10||tel.length>13){err("Informe seu WhatsApp com DDD, para a loja falar com você.");return}
   let troco=null;
   if(cli.pag==="Dinheiro"&&String(cli.troco)!==""){const v=parseFloat(String(cli.troco).replace(",","."));if(!(v>=tot)){err("O valor do troco deve ser maior ou igual ao total ("+brl(tot)+").");return}troco=v}
-  const o={codigo:String(Date.now()).slice(-5),criadoEm:Date.now(),status:"novo",baixado:false,cliente:{nome:cli.nome.trim(),tel,bairro:cli.bairro.trim(),rua:cli.rua.trim()},pag:cli.pag,troco,obs:cli.obs.trim().slice(0,300),itens:ls.map(l=>({pid:l.pid,vi:l.vi,nome:l.nome,q:l.q,p:l.p})),total:tot};
+  const o={codigo:String(Date.now()).slice(-5),criadoEm:Date.now(),status:"novo",baixado:false,cliente:{nome:cli.nome.trim(),tel,bairro:cli.bairro.trim(),rua:cli.rua.trim()},pag:cli.pag,troco,obs:cli.obs.trim().slice(0,300),itens:ls.map(l=>({pid:l.pid,vi:l.vi,nome:l.nome,q:l.q,p:l.p})),entrega:ent,total:tot};
   err("");$("fb").innerHTML="";enviando=true;$("fin").disabled=true;$("fin").lastChild.textContent="Enviando...";
   try{
     const id=await window.enviarPedido(o);
@@ -273,9 +284,9 @@ function bairroView(){
   const L=(D.loja&&D.loja.bairros)||[],h=$("bh"),e=$("ent");
   $("bairros").innerHTML=L.map(b=>`<option value="${esc(b)}">`).join("");
   const v=cli.bairro,tem=L.length&&norm(v),ok=tem&&L.some(b=>norm(b)===norm(v));
-  h.textContent=!tem?"":ok?"Entrega grátis neste bairro":"Esse bairro não está na lista de entrega grátis. A loja confirma se entrega e o valor pelo WhatsApp.";
+  h.textContent=!tem?"":ok?"Entrega grátis neste bairro":"Esse bairro não está na lista de entrega grátis. Taxa de entrega: "+brl(taxaBase())+".";
   h.className="bh "+(!tem?"":ok?"ok":"fora");
-  e.textContent=tem&&!ok?"A confirmar":"Grátis*";e.classList.toggle("fora",!!tem&&!ok);
+  cartView();
 }
 function ultimo(){try{return JSON.parse(localStorage.getItem("aromaebrilho_ultimo"))||[]}catch(e){return[]}}
 function repView(){
@@ -294,14 +305,73 @@ function repetir(){
   toast(add?(falta?"Pedido refeito. Alguns itens estão com estoque menor ou esgotados.":"Último pedido adicionado"):"Os itens do último pedido estão esgotados");
   if(add)gaveta(true);
 }
+const AB=["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"],NOMES=["domingo","segunda","terça","quarta","quinta","sexta","sábado"];
+const hm=t=>{const [h,m]=String(t||"0:0").split(":");return +h+"h"+(+m?m:"")};
+const mins=t=>{const [h,m]=String(t||"").split(":").map(Number);return isNaN(h)?null:h*60+(m||0)};
+function agoraFor(){
+  const o={};new Intl.DateTimeFormat("en-US",{timeZone:"America/Fortaleza",weekday:"short",hour:"2-digit",minute:"2-digit",hour12:false}).formatToParts(new Date()).forEach(x=>o[x.type]=x.value);
+  return {d:{Sun:0,Mon:1,Tue:2,Wed:3,Thu:4,Fri:5,Sat:6}[o.weekday],m:(+o.hour%24)*60+(+o.minute)};
+}
+function abertura(){
+  const L=D.loja||{};
+  if(L.fechado)return{aberto:false,bloq:true,txt:"Fechado temporariamente"};
+  const H=L.horarios;if(!H||!Object.values(H).some(h=>h&&h.on))return null;
+  const n=agoraFor(),t=H[n.d];
+  if(t&&t.on){const a=mins(t.a),f=mins(t.f);
+    if(a!=null&&f!=null&&n.m>=a&&n.m<f)return{aberto:true,txt:"Aberto agora, até "+hm(t.f)};
+    if(a!=null&&n.m<a)return{aberto:false,txt:"Fechado. Abre hoje às "+hm(t.a)}}
+  for(let i=1;i<=7;i++){const d=(n.d+i)%7,x=H[d];if(x&&x.on&&mins(x.a)!=null)return{aberto:false,txt:"Fechado. Abre "+(i===1?"amanhã":NOMES[d])+" às "+hm(x.a)}}
+  return{aberto:false,txt:"Fechado"};
+}
+function resumo(H){
+  const ord=[1,2,3,4,5,6,0],L=[];let i=0;
+  while(i<7){const d=ord[i],h=H[d];
+    if(!h||!h.on){i++;continue}
+    let j=i;while(j+1<7){const x=H[ord[j+1]];if(x&&x.on&&x.a===h.a&&x.f===h.f)j++;else break}
+    L.push((j>i?AB[d]+" a "+AB[ord[j]]:AB[d])+": "+hm(h.a)+" às "+hm(h.f));i=j+1}
+  return L;
+}
+function abView(){
+  const s=abertura(),e=$("ab"),av=$("aviso");
+  if(e){e.hidden=!s;if(s){e.textContent=s.txt;e.className="aberto "+(s.aberto?"on":"off")}}
+  if(av){const t=s&&!s.aberto;av.hidden=!t;av.textContent=s&&s.bloq?"A loja está fechada temporariamente e não está aceitando pedidos agora.":"A loja está fechada agora. Você pode fazer o pedido e ele será atendido quando abrirmos."}
+}
+const taxaBase=()=>{const t=(D.loja||{}).taxa;return t==null?10:(+t||0)};
+function taxaEnt(){
+  const B=(D.loja&&D.loja.bairros)||[];
+  if(!B.length||!norm(cli.bairro))return 0;
+  return B.some(b=>norm(b)===norm(cli.bairro))?0:taxaBase();
+}
+function entView(ent){
+  const B=(D.loja&&D.loja.bairros)||[],e=$("ent"),i=$("entinfo");
+  e.textContent=!B.length?"Grátis":!norm(cli.bairro)?"Informe o bairro":ent?brl(ent):"Grátis";
+  e.classList.toggle("fora",ent>0);
+  i.textContent=B.length?"Grátis nos bairros atendidos. Nos outros bairros, taxa de "+brl(taxaBase())+".":"Entrega grátis.";
+}
+const CORP={alvejante:"#5aa9e6",sabao:"#58b368",amaciante:"#ef8fb8",detergente:"#8fd14f",agua:"#2f6fdc",desinfetante:"#a77be0"};
+function arte(p){
+  const n=norm(p.nome),big=p.vars.some(v=>/5\s*l/i.test(v.t||"")),k=Object.keys(CORP).find(x=>n.includes(x)),c=CORP[k]||"#19647e";
+  const drop='<path d="M60 70c-6 9-9 14-9 18a9 9 0 0 0 18 0c0-4-3-9-9-18z" fill="'+c+'"/>';
+  let g;
+  if(n.includes("vassoura"))g='<rect x="57" y="6" width="6" height="64" rx="3" fill="#8a6a45" transform="rotate(16 60 40)"/><path d="M32 74l38-14 16 38H40z" fill="#e3b94f"/><path d="M42 96l8-22M52 96l6-24M62 96l4-24M72 96l2-22" stroke="#b8902f" stroke-width="2"/>';
+  else if(n==="pa"||n.startsWith("pa "))g='<rect x="58" y="12" width="6" height="58" rx="3" fill="#8a6a45" transform="rotate(10 60 40)"/><path d="M38 70h52l12 24H26z" fill="#4d8fb0"/><path d="M26 94h76" stroke="#2f6a88" stroke-width="4" stroke-linecap="round"/>';
+  else if(n.includes("rodo"))g='<rect x="57" y="8" width="6" height="64" rx="3" fill="#8a6a45"/><rect x="26" y="70" width="68" height="10" rx="4" fill="#2d3f4f"/><rect x="28" y="80" width="64" height="6" rx="2" fill="#1b2631"/>';
+  else if(big)g='<path d="M42 30h30l4 8h6a8 8 0 0 1 8 8v52a8 8 0 0 1-8 8H36a8 8 0 0 1-8-8V46a8 8 0 0 1 8-8h2z" fill="'+c+'"/><rect x="40" y="16" width="24" height="16" rx="4" fill="#fff"/><path d="M80 40c10 0 14 6 14 14v22c0 8-4 14-14 14" fill="none" stroke="'+c+'" stroke-width="7"/><rect x="38" y="52" width="46" height="42" rx="8" fill="#fff"/>'+drop;
+  else g='<rect x="48" y="12" width="24" height="14" rx="4" fill="#fff" stroke="'+c+'" stroke-width="3"/><path d="M44 26h32v10l8 8v54a8 8 0 0 1-8 8H44a8 8 0 0 1-8-8V44l8-8z" fill="'+c+'"/><rect x="42" y="56" width="36" height="36" rx="7" fill="#fff"/>'+drop;
+  return "data:image/svg+xml;utf8,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">'+g+"</svg>");
+}
+function horasHtml(l){
+  const H=l.horarios,L=H?resumo(H):[];
+  return (L.length?`<p>${L.map(esc).join("<br>")}</p>`:"")+(l.hor?`<p>${esc(l.hor)}</p>`:"");
+}
 function lojaView(){
   const l=D.loja||{};
-  $("loja").innerHTML=l.end?`<h2>Passe na loja</h2><p>${esc(l.end)}</p>${l.hor?`<p>${esc(l.hor)}</p>`:""}
+  $("loja").innerHTML=l.end?`<h2>Passe na loja</h2><p>${esc(l.end)}</p>${horasHtml(l)}
   <div class="r"><a target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(l.end)}">Ver no mapa</a>
   <a class="g" target="_blank" rel="noopener" href="https://wa.me/${ZAP}?text=${encodeURIComponent("Olá! Vim pelo site da Aroma e Brilho.")}">Falar no WhatsApp</a></div>`:"";
   $("loja").style.display=l.end?"":"none";
 }
-function setDados(d){D=d;ok=true;if(cat!=="Todos"&&!d.cats.includes(cat))cat="Todos";chips();grid();cartView();lojaView();bairroView()}
+function setDados(d){D=d;ok=true;abView();if(cat!=="Todos"&&!d.cats.includes(cat))cat="Todos";chips();grid();cartView();lojaView();bairroView()}
 $("q").oninput=e=>{busca=e.target.value;grid()};
 $("fab").onclick=()=>gaveta(true);$("fch").onclick=$("ov").onclick=()=>gaveta(false);
 $("fin").onclick=enviar;
@@ -309,7 +379,7 @@ $("lim").onclick=()=>{carrinho={};salvar();cartView();grid()};
 document.querySelectorAll("#pg button").forEach(b=>b.onclick=()=>{cli.pag=b.dataset.p;svc()});
 ["nome","tel","bairro","rua","troco","obs"].forEach(k=>{const el=$("c_"+k);el.value=cli[k];el.oninput=()=>{cli[k]=el.value;svc()}});
 function svc(){pagVis();bairroView();try{localStorage.setItem("aromaebrilho_cliente",JSON.stringify(cli))}catch(e){}}
-pagVis();chips();grid();cartView();lojaView();bairroView();
+pagVis();chips();grid();cartView();lojaView();bairroView();abView();setInterval(abView,60000);
 </script>
 <script>
 let ip=null;
