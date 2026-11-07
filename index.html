@@ -285,6 +285,7 @@ footer{text-align:center;color:var(--mut);padding:8px 0 28px;font-size:.82rem}
 .gg{width:100%}.cb .clr,.cb .rm{justify-self:center}.ou{display:flex;align-items:center;gap:10px;color:var(--mut);font-size:.82rem}.ou::before,.ou::after{content:"";flex:1;height:1px;background:var(--bd)}
 #af{display:grid;gap:10px}.cb .seg button{font-size:.92rem}.cb .seg button::before{display:none}
 .ok2{color:var(--ok)}
+.tg{color:var(--azul);font-weight:800;text-decoration:underline;text-underline-offset:3px;padding:2px 4px}
 .tl{display:flex;align-items:stretch}.tl span{flex:none;display:grid;place-items:center;padding:0 12px;background:var(--bg);border:1.5px solid var(--bd);border-right:0;border-radius:14px 0 0 14px;font-weight:700;color:var(--ink)}.tl input{border-radius:0 14px 14px 0}
 .ce{display:flex;gap:8px}.ce button{flex:none;background:var(--ink);color:#fff;font-weight:700;padding:0 16px;border-radius:14px}
 .rm{color:var(--red);font-size:.88rem;text-decoration:underline;text-underline-offset:3px;padding:6px}
@@ -495,7 +496,7 @@ function repetir(L){
 let USER=null,MEUS=[];
 const prim=n=>String(n||"").trim().split(" ")[0];
 function fillForm(){["nome","tel","bairro","rua"].forEach(k=>{const el=$("c_"+k);if(el)el.value=cli[k]||""});svc()}
-let AM="entrar",AT="email",AV={n:"",i:"",p:"",e:""},primeiraAuth=true,PERFIL=null;
+let AM="entrar",AV={n:"",i:"",p:"",e:""},primeiraAuth=true,PERFIL=null;
 function onUsuario(u){
   USER=u;MEUS=[];if(!u)PERFIL=null;
   const b=$("acc");b.textContent=u?prim(u.nome)||"Minha conta":"Entrar";b.classList.toggle("on",!!u);
@@ -522,24 +523,23 @@ const GLOGO='<svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true">
 function accView(){
   const el=$("cab");if(!el)return;
   if(!USER){
-    const tel=AT==="tel",cr=AM==="criar";
-    el.innerHTML=`<h2>Entre para pedir mais rápido</h2>
-    <ul class="vt"><li>Seus pedidos ficam salvos, em qualquer aparelho</li><li>Repita um pedido com um toque</li><li>Endereço e WhatsApp salvos, sem digitar de novo</li><li>Acompanhe cada pedido pelo histórico</li></ul>
-    <button class="gg" id="ggb" onclick="entrar()">${GLOGO}Continuar com Google</button>
-    <div class="ou">ou</div>
-    <div class="seg" id="am"><button class="${cr?"":"on"}" onclick="setAM('entrar')">Entrar</button><button class="${cr?"on":""}" onclick="setAM('criar')">Criar conta</button></div>
-    <div class="seg" id="at"><button class="${tel?"":"on"}" onclick="setAT('email')">E-mail</button><button class="${tel?"on":""}" onclick="setAT('tel')">Telefone</button></div>
+    const cr=AM==="criar",tel=!!AV.i.trim()&&!ehEmail(AV.i);
+    el.innerHTML=`<h2>${cr?"Criar sua conta":"Entrar na sua conta"}</h2>
     <form id="af" onsubmit="return enviaAuth(event)" novalidate>
       ${cr?`<input id="an" placeholder="Seu nome" autocomplete="name" maxlength="80" value="${esc(AV.n)}">`:""}
-      ${tel?`<div class="tl"><span>+55 85</span><input id="ai" type="tel" inputmode="numeric" placeholder="9 0000-0000" autocomplete="tel-national" value="${esc(AV.i)}"></div>`:`<input id="ai" type="email" placeholder="Seu Gmail ou e-mail" autocomplete="email" value="${esc(AV.i)}">`}
-      ${cr&&tel?`<input id="ae" type="email" placeholder="Seu Gmail (opcional): contato e ajuda para recuperar a senha" autocomplete="email" value="${esc(AV.e)}">`:""}
+      <input id="ai" type="text" placeholder="Gmail ou telefone" autocomplete="username" autocapitalize="none" spellcheck="false" oninput="idInput(this)" value="${esc(AV.i)}">
+      ${cr?`<input id="ae" type="email" placeholder="Seu Gmail (opcional): contato e ajuda para recuperar a senha" autocomplete="email" ${tel?"":"hidden"} value="${esc(AV.e)}">`:""}
       <input id="ap" type="password" placeholder="${cr?"Crie uma senha (mínimo 6 caracteres)":"Sua senha"}" autocomplete="${cr?"new-password":"current-password"}" value="${esc(AV.p)}">
       <p class="err" id="caerr" role="alert"></p>
       <button class="send" id="asb" type="submit">${cr?"Criar conta":"Entrar"}</button>
     </form>
-    ${!cr&&!tel?`<button class="clr" onclick="esqueci()">Esqueci minha senha</button>`:""}
-    ${!cr&&tel?`<button class="clr" onclick="esqueciTel()">Esqueci minha senha (falar com a loja)</button>`:""}
+    ${cr?"":`<button class="clr" onclick="esqueci()">Esqueci minha senha</button>`}
+    <div class="ou">ou</div>
+    <button class="gg" id="ggb" onclick="entrar()">${GLOGO}Continuar com Google</button>
+    <p class="info" style="text-align:center">${cr?"Já tem conta?":"Ainda não tem conta?"} <button class="tg" onclick="setAM('${cr?"entrar":"criar"}')">${cr?"Entrar":"Criar conta"}</button></p>
     <button class="clr" onclick="fechaCa()">Continuar sem entrar</button>
+    <h3>Vantagens de ter uma conta</h3>
+    <ul class="vt"><li>Seus pedidos ficam salvos, em qualquer aparelho</li><li>Repita um pedido com um toque</li><li>Endereço e WhatsApp salvos, sem digitar de novo</li><li>Acompanhe cada pedido pelo histórico</li></ul>
     <p class="info">Entrar é opcional: você pode fazer pedidos sem conta. Ao entrar, guardamos seu nome, WhatsApp e endereço só para facilitar seus pedidos, e você pode apagar tudo quando quiser.</p>`;
     return;
   }
@@ -557,12 +557,26 @@ function accView(){
 
 function saveAF(){const g=id=>$(id)?$(id).value:null;const n=g("an"),i=g("ai"),p=g("ap"),e=g("ae");if(e!==null)AV.e=e;if(n!==null)AV.n=n;if(i!==null)AV.i=i;if(p!==null)AV.p=p}
 function setAM(m){saveAF();AM=m;accView()}
-function setAT(t){saveAF();AT=t;AV.i="";accView()}
+const ehEmail=v=>/[a-zA-Z@]/.test(v);
+function fmtTel(raw){
+  let d=String(raw).replace(/\D/g,"");
+  if(d.startsWith("5585"))d=d.slice(4);
+  if(d.startsWith("55"))d=d.slice(2);
+  if(d.startsWith("85"))d=d.slice(2);
+  d=d.slice(0,9);if(!d)return"";
+  return "+55 85 "+(d.length>4?d.slice(0,d[0]==="9"?5:4)+"-"+d.slice(d[0]==="9"?5:4):d);
+}
+function idInput(el){
+  const v=el.value;
+  if(ehEmail(v)){const m=v.match(/^\+55 85 \d*(.*)$/);if(m&&/^[+\d\s-]*$/.test(v.slice(0,v.length-m[1].length)))el.value=m[1]}
+  else el.value=fmtTel(v);
+  const ae=$("ae");if(ae)ae.hidden=!(el.value&&!ehEmail(el.value));
+}
 const MSGINV="Gmail ou número de telefone inválido";
 function telDigitos(v){let d=String(v||"").replace(/\D/g,"");if(d.startsWith("55")&&d.length>=12)d=d.slice(2);if(d.startsWith("85")&&d.length>=10)d=d.slice(2);if(d.length===9?d[0]!=="9":d.length!==8)return"";return "85"+d}
-const AEMAIL={"auth/email-already-in-use":"Já existe uma conta com esses dados. Use a aba Entrar.","auth/invalid-credential":"Dados ou senha incorretos.","auth/wrong-password":"Dados ou senha incorretos.","auth/user-not-found":"Dados ou senha incorretos.","auth/invalid-login-credentials":"Dados ou senha incorretos.","auth/weak-password":"Senha fraca. Use pelo menos 6 caracteres.","auth/invalid-email":MSGINV,"auth/too-many-requests":"Muitas tentativas. Aguarde um pouco e tente de novo.","auth/network-request-failed":"Sem conexão. Confira a internet.","auth/operation-not-allowed":"Este tipo de login ainda não foi ativado no Firebase."};
+const AEMAIL={"auth/email-already-in-use":"Já existe uma conta com esses dados. Use Entrar.","auth/invalid-credential":"Dados ou senha incorretos.","auth/wrong-password":"Dados ou senha incorretos.","auth/user-not-found":"Dados ou senha incorretos.","auth/invalid-login-credentials":"Dados ou senha incorretos.","auth/weak-password":"Senha fraca. Use pelo menos 6 caracteres.","auth/invalid-email":MSGINV,"auth/too-many-requests":"Muitas tentativas. Aguarde um pouco e tente de novo.","auth/network-request-failed":"Sem conexão. Confira a internet.","auth/operation-not-allowed":"Este tipo de login ainda não foi ativado no Firebase."};
 async function enviaAuth(ev){
-  ev.preventDefault();saveAF();const m=$("caerr"),b=$("asb"),cr=AM==="criar",tel=AT==="tel";
+  ev.preventDefault();saveAF();const m=$("caerr"),b=$("asb"),cr=AM==="criar",tel=!!AV.i.trim()&&!ehEmail(AV.i);
   const e=t=>{m.className="err";m.textContent=t};
   let id=AV.i.trim();
   if(tel){id=telDigitos(id);if(!id)return e(MSGINV);id+="@fone.example.com"}
@@ -577,20 +591,23 @@ async function enviaAuth(ev){
   }catch(x){b.disabled=false;e(AEMAIL[x&&x.code]||"Não foi possível entrar agora. Tente de novo.")}
   return false;
 }
-function esqueciTel(){
-  saveAF();const d=telDigitos(AV.i);
-  window.open("https://wa.me/"+ZAP+"?text="+encodeURIComponent("Olá! Esqueci a senha da minha conta no site."+(d?" Meu telefone de cadastro: ("+d.slice(0,2)+") "+d.slice(2):"")),"_blank","noopener");
-}
 async function salvaEmail(){
   const v=($("ce").value||"").trim().toLowerCase();
   if(v&&!/^\S+@\S+\.\S+$/.test(v)){toast("Gmail inválido");return}
   try{await window.salvarPerfil(USER.uid,{email:v});PERFIL=Object.assign({},PERFIL,{email:v});toast(v?"Gmail de contato salvo":"Gmail removido")}catch(e){toast("Não foi possível salvar agora")}
 }
 async function esqueci(){
-  saveAF();const m=$("caerr"),id=AV.i.trim().toLowerCase();
-  if(!/^\S+@\S+\.\S+$/.test(id)){m.className="err";m.textContent="Digite seu e-mail no campo acima e toque de novo em Esqueci minha senha.";return}
-  try{await window.esqueci(id);m.className="err ok2";m.textContent="Se esse e-mail tiver conta, enviamos um link para redefinir a senha. Olhe também o spam."}
-  catch(x){m.className="err";m.textContent=AEMAIL[x&&x.code]||"Não foi possível enviar agora."}
+  saveAF();const m=$("caerr"),v=AV.i.trim();
+  const e=(t,ok)=>{m.className="err"+(ok?" ok2":"");m.textContent=t};
+  if(!v)return e("Digite seu Gmail ou telefone acima e toque de novo em Esqueci minha senha.");
+  if(ehEmail(v)){
+    const id=v.toLowerCase();if(!/^\S+@\S+\.\S+$/.test(id))return e(MSGINV);
+    try{await window.resetSenha(id);e("Se esse e-mail tiver conta, enviamos um link para redefinir a senha. Olhe também o spam.",1)}
+    catch(x){e(AEMAIL[x&&x.code]||"Não foi possível enviar agora.")}
+  }else{
+    const d=telDigitos(v);if(!d)return e(MSGINV);
+    window.open("https://wa.me/"+ZAP+"?text="+encodeURIComponent("Olá! Esqueci a senha da minha conta no site. Meu telefone de cadastro: ("+d.slice(0,2)+") "+d.slice(2)),"_blank","noopener");
+  }
 }
 async function entrar(){
   const b=$("ggb");if(b)b.disabled=true;
@@ -823,7 +840,7 @@ window.meusPedidos=async uid=>(await getDocs(query(collection(db,"pedidos"),wher
 const emite=u=>{const e=u.email||"",ph=/@fone\.example\.com$/.test(e);window.onUsuario({uid:u.uid,nome:u.displayName||"",email:ph?"":e,tel:ph?e.split("@")[0]:"",foto:u.photoURL||"",tipo:ph?"tel":u.providerData.some(p=>p.providerId==="google.com")?"google":"email"})};
 window.entrarEmail=(e,p)=>signInWithEmailAndPassword(auth,e,p);
 window.criarConta=async(e,p,n)=>{const c=await createUserWithEmailAndPassword(auth,e,p);try{await updateProfile(c.user,{displayName:n});emite(c.user)}catch(x){}return c};
-window.esqueci=e=>sendPasswordResetEmail(auth,e);
+window.resetSenha=e=>sendPasswordResetEmail(auth,e);
 onAuthStateChanged(auth,async u=>{
   const g=u&&!u.isAnonymous?u:null;
   if(g)emite(g);else window.onUsuario(null);
