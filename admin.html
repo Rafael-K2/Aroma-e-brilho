@@ -441,7 +441,7 @@ function card(o){
   return `<article class="od st_${o.status} ${o.status==="novo"?"nv":""}" data-id="${esc(o.id)}"><div class="oh"><h3>Pedido ${esc(o.codigo)}</h3><span class="bg s_${o.status}">${ST[o.status]}</span><time>${h}</time></div>
   <p class="cl"><b>${esc(c.nome)}</b><br>${esc(c.bairro)}, ${esc(c.rua)}</p>${o.entrega?`<p class="fora">Bairro fora da lista: taxa de entrega de ${brl(o.entrega)} somada ao total.</p>`:fora?`<p class="fora">Bairro fora da lista de entrega grátis. Confirme a entrega com o cliente.</p>`:""}
   <ul class="oi">${(o.itens||[]).map(i=>`<li><span>${i.q}x ${esc(i.nome)}</span><span>${brl(i.q*i.p)}</span></li>`).join("")}</ul>
-  <p class="pgm">${pg}</p>${o.nota?`<p class="pgm">Avaliação: ${"★".repeat(o.nota)}${"☆".repeat(5-o.nota)}${o.comentario?" - "+esc(o.comentario):""}</p>`:""}${o.obs?`<p class="ob">Obs: ${esc(o.obs)}</p>`:""}
+  <p class="pgm">${pg}</p>${o.nota?`<p class="pgm">Avaliação: ${"★".repeat(o.nota)}${"☆".repeat(5-o.nota)}${o.comentario?" - "+esc(o.comentario):""}</p>`:""}${o.conta==="tel"?`<p class="ob">Telefone de cadastro não verificado. Confirme pelo WhatsApp antes de entregar.</p>`:""}${o.obs?`<p class="ob">Obs: ${esc(o.obs)}</p>`:""}
   ${o.entrega?`<div class="ot" style="font-size:.9rem;font-weight:500"><span>Entrega</span><span>${brl(o.entrega)}</span></div>`:""}<div class="ot"><span>Total</span><span>${brl(o.total)}</span></div>
   <div class="oa">${B.map(([st,t])=>`<button class="btn" onclick="mudarStatus('${o.id}','${st}')">${t}</button>`).join("")}
   <button class="ghost" onclick="imprimir('${o.id}')">Imprimir ficha</button>
@@ -578,7 +578,7 @@ Object.assign(window,{
 function alerta(t){let a=document.getElementById("alerta");if(!t){if(a)a.remove();return}if(!a){a=document.createElement("div");a.id="alerta";a.className="alerta";a.setAttribute("role","alert");document.body.prepend(a)}a.textContent=t}
 function falha(e){
   const c=e&&e.code||"";
-  alerta(c==="permission-denied"?"O Firebase negou o acesso aos dados. Publique as regras (firestore.rules) com o mesmo e-mail que você usa no login do painel."
+  alerta(c==="permission-denied"?"O Firebase negou o acesso aos dados. Publique as regras (firestore.rules) com o mesmo e-mail do login do painel. Se você entrou com uma conta de cliente, saia e entre com a conta do dono."
     :c==="unavailable"||c==="deadline-exceeded"?"Sem conexão com o Firebase. Confira a internet e recarregue a página."
     :"Não foi possível carregar os dados ("+(c||(e&&e.message)||"erro desconhecido")+").");
 }

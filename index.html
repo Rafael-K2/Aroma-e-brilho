@@ -282,6 +282,11 @@ footer{text-align:center;color:var(--mut);padding:8px 0 28px;font-size:.82rem}
 .brand,.ib,.top a.lk{white-space:nowrap}
 @media(max-width:480px){.top{gap:6px}.top a.lk,.ib{padding:6px 10px;font-size:.8rem}.top a.lk::before,.ib::before{display:none}.brand{font-size:.95rem}.ib.acc::before{display:block}}
 @media(max-width:400px){.brand{font-size:0;gap:0}}
+.gg{width:100%}.cb .clr,.cb .rm{justify-self:center}.ou{display:flex;align-items:center;gap:10px;color:var(--mut);font-size:.82rem}.ou::before,.ou::after{content:"";flex:1;height:1px;background:var(--bd)}
+#af{display:grid;gap:10px}.cb .seg button{font-size:.92rem}.cb .seg button::before{display:none}
+.ok2{color:var(--ok)}
+.tl{display:flex;align-items:stretch}.tl span{flex:none;display:grid;place-items:center;padding:0 12px;background:var(--bg);border:1.5px solid var(--bd);border-right:0;border-radius:14px 0 0 14px;font-weight:700;color:var(--ink)}.tl input{border-radius:0 14px 14px 0}
+.ce{display:flex;gap:8px}.ce button{flex:none;background:var(--ink);color:#fff;font-weight:700;padding:0 16px;border-radius:14px}
 .rm{color:var(--red);font-size:.88rem;text-decoration:underline;text-underline-offset:3px;padding:6px}
 </style>
 </head>
@@ -407,7 +412,7 @@ async function enviar(){
   let troco=null;
   if(cli.pag==="Dinheiro"&&String(cli.troco)!==""){const v=parseFloat(String(cli.troco).replace(",","."));if(!(v>=tot)){err("O valor do troco deve ser maior ou igual ao total ("+brl(tot)+").");return}troco=v}
   const o={codigo:String(Date.now()).slice(-5),criadoEm:Date.now(),status:"novo",baixado:false,cliente:{nome:cli.nome.trim(),tel,bairro:cli.bairro.trim(),rua:cli.rua.trim()},pag:cli.pag,troco,obs:cli.obs.trim().slice(0,300),itens:ls.map(l=>({pid:l.pid,vi:l.vi,nome:l.nome,q:l.q,p:l.p})),entrega:ent,total:tot};
-  if(USER)o.uid=USER.uid;
+  if(USER){o.uid=USER.uid;o.conta=USER.tipo||"email"}
   err("");$("fb").innerHTML="";enviando=true;$("fin").disabled=true;$("fin").lastChild.textContent="Enviando...";
   try{
     const id=await window.enviarPedido(o);
@@ -490,19 +495,24 @@ function repetir(L){
 let USER=null,MEUS=[];
 const prim=n=>String(n||"").trim().split(" ")[0];
 function fillForm(){["nome","tel","bairro","rua"].forEach(k=>{const el=$("c_"+k);if(el)el.value=cli[k]||""});svc()}
+let AM="entrar",AT="email",AV={n:"",i:"",p:"",e:""},primeiraAuth=true,PERFIL=null;
 function onUsuario(u){
-  USER=u;MEUS=u?[]:[];
+  USER=u;MEUS=[];if(!u)PERFIL=null;
   const b=$("acc");b.textContent=u?prim(u.nome)||"Minha conta":"Entrar";b.classList.toggle("on",!!u);
-  if(u&&!cli.nome&&u.nome){cli.nome=u.nome;fillForm()}
+  if(u&&((!cli.nome&&u.nome)||(!cli.tel&&u.tel))){if(!cli.nome&&u.nome)cli.nome=u.nome;if(!cli.tel&&u.tel)cli.tel=u.tel;fillForm()}
   lgView();accView();if(u)carregaMeus();
+  if(primeiraAuth){primeiraAuth=false;
+    if(!u){let v=0;try{v=sessionStorage.getItem("ab_ca")}catch(e){}
+      if(!v){try{sessionStorage.setItem("ab_ca","1")}catch(e){}setTimeout(()=>{if(!USER&&$("ca").hidden)abreCa()},900)}}}
 }
 function onPerfil(p){
+  PERFIL=p;
   if(!p)return;
   let m=0;for(const k of["nome","tel","bairro","rua"])if(!String(cli[k]||"").trim()&&p[k]){cli[k]=p[k];m=1}
   if(m)fillForm();
 }
 function lgView(){
-  $("lg").innerHTML=USER?"":`<div class="lgb"><div><b>Tem conta Google?</b><span>Entre e deixe seus dados e pedidos salvos.</span></div><button onclick="abreCa()">Entrar</button></div>`;
+  $("lg").innerHTML=USER?"":`<div class="lgb"><div><b>Tem conta?</b><span>Entre e deixe seus dados e pedidos salvos.</span></div><button onclick="abreCa()">Entrar</button></div>`;
 }
 function abreCa(){accView();$("ca").hidden=false;document.body.style.overflow="hidden"}
 function fechaCa(){$("ca").hidden=true;document.body.style.overflow=""}
@@ -512,23 +522,75 @@ const GLOGO='<svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true">
 function accView(){
   const el=$("cab");if(!el)return;
   if(!USER){
+    const tel=AT==="tel",cr=AM==="criar";
     el.innerHTML=`<h2>Entre para pedir mais rápido</h2>
     <ul class="vt"><li>Seus pedidos ficam salvos, em qualquer aparelho</li><li>Repita um pedido com um toque</li><li>Endereço e WhatsApp salvos, sem digitar de novo</li><li>Acompanhe cada pedido pelo histórico</li></ul>
     <button class="gg" id="ggb" onclick="entrar()">${GLOGO}Continuar com Google</button>
-    <p class="err" id="caerr" role="alert"></p>
+    <div class="ou">ou</div>
+    <div class="seg" id="am"><button class="${cr?"":"on"}" onclick="setAM('entrar')">Entrar</button><button class="${cr?"on":""}" onclick="setAM('criar')">Criar conta</button></div>
+    <div class="seg" id="at"><button class="${tel?"":"on"}" onclick="setAT('email')">E-mail</button><button class="${tel?"on":""}" onclick="setAT('tel')">Telefone</button></div>
+    <form id="af" onsubmit="return enviaAuth(event)" novalidate>
+      ${cr?`<input id="an" placeholder="Seu nome" autocomplete="name" maxlength="80" value="${esc(AV.n)}">`:""}
+      ${tel?`<div class="tl"><span>+55 85</span><input id="ai" type="tel" inputmode="numeric" placeholder="9 0000-0000" autocomplete="tel-national" value="${esc(AV.i)}"></div>`:`<input id="ai" type="email" placeholder="Seu Gmail ou e-mail" autocomplete="email" value="${esc(AV.i)}">`}
+      ${cr&&tel?`<input id="ae" type="email" placeholder="Seu Gmail (opcional): contato e ajuda para recuperar a senha" autocomplete="email" value="${esc(AV.e)}">`:""}
+      <input id="ap" type="password" placeholder="${cr?"Crie uma senha (mínimo 6 caracteres)":"Sua senha"}" autocomplete="${cr?"new-password":"current-password"}" value="${esc(AV.p)}">
+      <p class="err" id="caerr" role="alert"></p>
+      <button class="send" id="asb" type="submit">${cr?"Criar conta":"Entrar"}</button>
+    </form>
+    ${!cr&&!tel?`<button class="clr" onclick="esqueci()">Esqueci minha senha</button>`:""}
+    ${!cr&&tel?`<button class="clr" onclick="esqueciTel()">Esqueci minha senha (falar com a loja)</button>`:""}
     <button class="clr" onclick="fechaCa()">Continuar sem entrar</button>
     <p class="info">Entrar é opcional: você pode fazer pedidos sem conta. Ao entrar, guardamos seu nome, WhatsApp e endereço só para facilitar seus pedidos, e você pode apagar tudo quando quiser.</p>`;
     return;
   }
   const L=(MEUS||[]).slice().sort((a,b)=>b.criadoEm-a.criadoEm).slice(0,8);
-  el.innerHTML=`<div class="me"><i>${USER.foto?`<img src="${esc(USER.foto)}" alt="" referrerpolicy="no-referrer">`:esc((USER.nome||"?")[0].toUpperCase())}</i><div><b>${esc(USER.nome||"Minha conta")}</b><small>${esc(USER.email)}</small></div></div>
+  el.innerHTML=`<div class="me"><i>${USER.foto?`<img src="${esc(USER.foto)}" alt="" referrerpolicy="no-referrer">`:esc((USER.nome||"?")[0].toUpperCase())}</i><div><b>${esc(USER.nome||"Minha conta")}</b><small>${esc(USER.email||USER.tel)}</small></div></div>
   <h3>Meus pedidos</h3>
   ${MEUS===null?`<p class="info">Não foi possível carregar seus pedidos agora.</p>`:!L.length?`<p class="info">Você ainda não fez pedidos com esta conta. Eles aparecem aqui depois do primeiro.</p>`:L.map((o,i)=>`<div class="mp"><div><b>Pedido ${esc(o.codigo)} · ${brl(o.total)}</b><small>${new Date(o.criadoEm).toLocaleDateString("pt-BR")} · ${esc(ST[o.status]||o.status)}</small><small>${esc((o.itens||[]).map(x=>x.q+"x "+x.nome).join(", "))}</small></div><button onclick="repetirPed(${i})">Repetir</button></div>`).join("")}
+  ${USER.tel?`<h3>Gmail de contato</h3><p class="info">Opcional. Usamos só para falar com você e ajudar a recuperar o acesso.</p><div class="ce"><input id="ce" type="email" placeholder="seu@gmail.com" value="${esc((PERFIL&&PERFIL.email)||"")}"><button onclick="salvaEmail()">Salvar</button></div>`:""}
   <h3>Meus dados</h3>
   <p class="info">${esc(cli.nome||"Sem nome")}${cli.tel?" · "+esc(cli.tel):""}${cli.rua?" · "+esc(cli.rua):""}${cli.bairro?", "+esc(cli.bairro):""}. Salvamos e atualizamos quando você faz um pedido.</p>
   <button class="rm" onclick="apagaPerfil()">Apagar meus dados salvos</button>
   <button class="clr" onclick="sairConta()">Sair da conta</button>`;
   el._L=L;
+}
+
+function saveAF(){const g=id=>$(id)?$(id).value:null;const n=g("an"),i=g("ai"),p=g("ap"),e=g("ae");if(e!==null)AV.e=e;if(n!==null)AV.n=n;if(i!==null)AV.i=i;if(p!==null)AV.p=p}
+function setAM(m){saveAF();AM=m;accView()}
+function setAT(t){saveAF();AT=t;AV.i="";accView()}
+const MSGINV="Gmail ou número de telefone inválido";
+function telDigitos(v){let d=String(v||"").replace(/\D/g,"");if(d.startsWith("55")&&d.length>=12)d=d.slice(2);if(d.startsWith("85")&&d.length>=10)d=d.slice(2);if(d.length===9?d[0]!=="9":d.length!==8)return"";return "85"+d}
+const AEMAIL={"auth/email-already-in-use":"Já existe uma conta com esses dados. Use a aba Entrar.","auth/invalid-credential":"Dados ou senha incorretos.","auth/wrong-password":"Dados ou senha incorretos.","auth/user-not-found":"Dados ou senha incorretos.","auth/invalid-login-credentials":"Dados ou senha incorretos.","auth/weak-password":"Senha fraca. Use pelo menos 6 caracteres.","auth/invalid-email":MSGINV,"auth/too-many-requests":"Muitas tentativas. Aguarde um pouco e tente de novo.","auth/network-request-failed":"Sem conexão. Confira a internet.","auth/operation-not-allowed":"Este tipo de login ainda não foi ativado no Firebase."};
+async function enviaAuth(ev){
+  ev.preventDefault();saveAF();const m=$("caerr"),b=$("asb"),cr=AM==="criar",tel=AT==="tel";
+  const e=t=>{m.className="err";m.textContent=t};
+  let id=AV.i.trim();
+  if(tel){id=telDigitos(id);if(!id)return e(MSGINV);id+="@fone.example.com"}
+  else{id=id.toLowerCase();if(!/^\S+@\S+\.\S+$/.test(id))return e(MSGINV)}
+  const ce=AV.e.trim().toLowerCase();if(cr&&tel&&ce&&!/^\S+@\S+\.\S+$/.test(ce))return e("O Gmail de contato está inválido. Corrija ou deixe em branco.");
+  if(cr&&!AV.n.trim())return e("Informe o seu nome.");
+  if(AV.p.length<6)return e("A senha precisa ter pelo menos 6 caracteres.");
+  b.disabled=true;e("");
+  try{
+    if(cr){const c=await window.criarConta(id,AV.p,AV.n.trim().slice(0,80));if(tel&&ce)window.salvarPerfil(c.user.uid,{email:ce}).catch(()=>{})}else await window.entrarEmail(id,AV.p);
+    AV={n:"",i:"",p:"",e:""};fechaCa();toast(cr?"Conta criada":"Você entrou");
+  }catch(x){b.disabled=false;e(AEMAIL[x&&x.code]||"Não foi possível entrar agora. Tente de novo.")}
+  return false;
+}
+function esqueciTel(){
+  saveAF();const d=telDigitos(AV.i);
+  window.open("https://wa.me/"+ZAP+"?text="+encodeURIComponent("Olá! Esqueci a senha da minha conta no site."+(d?" Meu telefone de cadastro: ("+d.slice(0,2)+") "+d.slice(2):"")),"_blank","noopener");
+}
+async function salvaEmail(){
+  const v=($("ce").value||"").trim().toLowerCase();
+  if(v&&!/^\S+@\S+\.\S+$/.test(v)){toast("Gmail inválido");return}
+  try{await window.salvarPerfil(USER.uid,{email:v});PERFIL=Object.assign({},PERFIL,{email:v});toast(v?"Gmail de contato salvo":"Gmail removido")}catch(e){toast("Não foi possível salvar agora")}
+}
+async function esqueci(){
+  saveAF();const m=$("caerr"),id=AV.i.trim().toLowerCase();
+  if(!/^\S+@\S+\.\S+$/.test(id)){m.className="err";m.textContent="Digite seu e-mail no campo acima e toque de novo em Esqueci minha senha.";return}
+  try{await window.esqueci(id);m.className="err ok2";m.textContent="Se esse e-mail tiver conta, enviamos um link para redefinir a senha. Olhe também o spam."}
+  catch(x){m.className="err";m.textContent=AEMAIL[x&&x.code]||"Não foi possível enviar agora."}
 }
 async function entrar(){
   const b=$("ggb");if(b)b.disabled=true;
@@ -738,7 +800,7 @@ if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWor
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import {getFirestore,collection,doc,onSnapshot,addDoc,updateDoc,setDoc,deleteDoc,getDoc,getDocs,query,where,limit} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
-import {getAuth,GoogleAuthProvider,signInWithPopup,signInWithRedirect,onAuthStateChanged,signOut} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import {getAuth,GoogleAuthProvider,signInWithPopup,signInWithRedirect,onAuthStateChanged,signOut,createUserWithEmailAndPassword,signInWithEmailAndPassword,updateProfile,sendPasswordResetEmail} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 const app=initializeApp({apiKey:"AIzaSyCGFv2xrJveqk4gR_OeRCqj1aJVT_atEQ8",authDomain:"aroma-e-brilho.firebaseapp.com",projectId:"aroma-e-brilho",storageBucket:"aroma-e-brilho.firebasestorage.app",messagingSenderId:"674882407782",appId:"1:674882407782:web:a6727100592d3813310ca7"});
 const RECAPTCHA_SITE_KEY="";
 if(RECAPTCHA_SITE_KEY){const m=await import("https://www.gstatic.com/firebasejs/10.14.1/firebase-app-check.js");m.initializeAppCheck(app,{provider:new m.ReCaptchaV3Provider(RECAPTCHA_SITE_KEY),isTokenAutoRefreshEnabled:true})}
@@ -755,12 +817,16 @@ window.acompanhar=(id,cb)=>{unT&&unT();unT=onSnapshot(doc(db,"pedidos",id),s=>cb
 const auth=getAuth(app),gp=new GoogleAuthProvider();
 window.entrarGoogle=async()=>{try{await signInWithPopup(auth,gp)}catch(e){if(e.code==="auth/popup-blocked"){await signInWithRedirect(auth,gp);return}if(e.code==="auth/popup-closed-by-user"||e.code==="auth/cancelled-popup-request")return;throw e}};
 window.sair=()=>signOut(auth);
-window.salvarPerfil=(uid,d)=>setDoc(doc(db,"clientes",uid),{...d,atualizadoEm:Date.now()});
+window.salvarPerfil=(uid,d)=>setDoc(doc(db,"clientes",uid),{...d,atualizadoEm:Date.now()},{merge:true});
 window.apagarPerfil=uid=>deleteDoc(doc(db,"clientes",uid));
 window.meusPedidos=async uid=>(await getDocs(query(collection(db,"pedidos"),where("uid","==",uid),limit(50)))).docs.map(d=>({id:d.id,...d.data()}));
+const emite=u=>{const e=u.email||"",ph=/@fone\.example\.com$/.test(e);window.onUsuario({uid:u.uid,nome:u.displayName||"",email:ph?"":e,tel:ph?e.split("@")[0]:"",foto:u.photoURL||"",tipo:ph?"tel":u.providerData.some(p=>p.providerId==="google.com")?"google":"email"})};
+window.entrarEmail=(e,p)=>signInWithEmailAndPassword(auth,e,p);
+window.criarConta=async(e,p,n)=>{const c=await createUserWithEmailAndPassword(auth,e,p);try{await updateProfile(c.user,{displayName:n});emite(c.user)}catch(x){}return c};
+window.esqueci=e=>sendPasswordResetEmail(auth,e);
 onAuthStateChanged(auth,async u=>{
-  const g=u&&u.providerData.some(p=>p.providerId==="google.com")?u:null;
-  window.onUsuario(g?{uid:g.uid,nome:g.displayName||"",email:g.email||"",foto:g.photoURL||""}:null);
+  const g=u&&!u.isAnonymous?u:null;
+  if(g)emite(g);else window.onUsuario(null);
   if(g){try{const s=await getDoc(doc(db,"clientes",g.uid));window.onPerfil(s.exists()?s.data():null)}catch(e){}}
 });
 window.retomar();
