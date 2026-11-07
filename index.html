@@ -285,6 +285,7 @@ footer{text-align:center;color:var(--mut);padding:8px 0 28px;font-size:.82rem}
 .gg{width:100%}.cb .clr,.cb .rm{justify-self:center}.ou{display:flex;align-items:center;gap:10px;color:var(--mut);font-size:.82rem}.ou::before,.ou::after{content:"";flex:1;height:1px;background:var(--bd)}
 #af{display:grid;gap:10px}.cb .seg button{font-size:.92rem}.cb .seg button::before{display:none}
 .ok2{color:var(--ok)}
+.clg{width:76px;height:76px;border-radius:50%;object-fit:cover;display:block;margin:-4px auto 0}
 .tg{color:var(--azul);font-weight:800;text-decoration:underline;text-underline-offset:3px;padding:2px 4px}
 .tl{display:flex;align-items:stretch}.tl span{flex:none;display:grid;place-items:center;padding:0 12px;background:var(--bg);border:1.5px solid var(--bd);border-right:0;border-radius:14px 0 0 14px;font-weight:700;color:var(--ink)}.tl input{border-radius:0 14px 14px 0}
 .ce{display:flex;gap:8px}.ce button{flex:none;background:var(--ink);color:#fff;font-weight:700;padding:0 16px;border-radius:14px}
@@ -524,7 +525,7 @@ function accView(){
   const el=$("cab");if(!el)return;
   if(!USER){
     const cr=AM==="criar",tel=!!AV.i.trim()&&!ehEmail(AV.i);
-    el.innerHTML=`<h2>${cr?"Criar sua conta":"Entrar na sua conta"}</h2>
+    el.innerHTML=`<img class="clg" src="logo.png" alt="Aroma e Brilho"><h2>${cr?"Criar sua conta":"Entrar na sua conta"}</h2>
     <form id="af" onsubmit="return enviaAuth(event)" novalidate>
       ${cr?`<input id="an" placeholder="Seu nome" autocomplete="name" maxlength="80" value="${esc(AV.n)}">`:""}
       <input id="ai" type="text" placeholder="Gmail ou telefone" autocomplete="username" autocapitalize="none" spellcheck="false" oninput="idInput(this)" value="${esc(AV.i)}">
