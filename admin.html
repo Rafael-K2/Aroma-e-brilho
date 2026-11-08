@@ -322,7 +322,7 @@ function loginView(err){
   <form class="lf" id="f"><h2>Entrar</h2><input id="em" type="email" placeholder="E-mail" autocomplete="username" required aria-label="E-mail">
   <input id="pw" type="password" placeholder="Senha" autocomplete="current-password" required aria-label="Senha">
   <p class="err" role="alert">${err||""}</p><button class="btn">Entrar no painel</button></form></div>`;
-  $("f").onsubmit=async e=>{e.preventDefault();try{await signInWithEmailAndPassword(auth,$("em").value,$("pw").value)}catch(x){loginView("E-mail ou senha incorretos. Confira e tente de novo.")}};
+  $("f").onsubmit=async e=>{e.preventDefault();try{await signInWithEmailAndPassword(auth,$("em").value,$("pw").value)}catch(x){const c=x.code||"";loginView(c==="auth/operation-not-allowed"?"Login por e-mail/senha desativado no Firebase (ative em Authentication → Método de login).":c==="auth/unauthorized-domain"?"Domínio não autorizado no Firebase (Authentication → Configurações → Domínios autorizados).":c==="auth/too-many-requests"?"Muitas tentativas. Espere alguns minutos.":c==="auth/network-request-failed"?"Sem conexão com o Firebase.":c==="auth/invalid-credential"||c==="auth/wrong-password"||c==="auth/user-not-found"||c==="auth/invalid-email"?"E-mail ou senha incorretos. (código: "+c+")":"Erro: "+c)}};
 }
 
 function stats(){if(!$("stats"))return;
