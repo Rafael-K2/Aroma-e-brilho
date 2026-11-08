@@ -285,6 +285,9 @@ footer{text-align:center;color:var(--mut);padding:8px 0 28px;font-size:.82rem}
 .gg{width:100%}.cb .clr,.cb .rm{justify-self:center}.ou{display:flex;align-items:center;gap:10px;color:var(--mut);font-size:.82rem}.ou::before,.ou::after{content:"";flex:1;height:1px;background:var(--bd)}
 #af{display:grid;gap:10px}.cb .seg button{font-size:.92rem}.cb .seg button::before{display:none}
 .ok2{color:var(--ok)}
+.cb .send{width:100%}[hidden]{display:none!important}
+.dir{display:grid;justify-items:center}
+.ck{display:flex;gap:10px;align-items:flex-start;font-size:.88rem;color:var(--mut);cursor:pointer}.ck input{flex:none;width:20px;height:20px;margin:1px 0 0;accent-color:var(--azul)}
 .clg{width:76px;height:76px;border-radius:50%;object-fit:cover;display:block;margin:-4px auto 0}
 .tg{color:var(--azul);font-weight:800;text-decoration:underline;text-underline-offset:3px;padding:2px 4px}
 .tl{display:flex;align-items:stretch}.tl span{flex:none;display:grid;place-items:center;padding:0 12px;background:var(--bg);border:1.5px solid var(--bd);border-right:0;border-radius:14px 0 0 14px;font-weight:700;color:var(--ink)}.tl input{border-radius:0 14px 14px 0}
@@ -328,12 +331,13 @@ footer{text-align:center;color:var(--mut);padding:8px 0 28px;font-size:.82rem}
       <textarea id="c_obs" rows="2" placeholder="Observações, como ponto de referência"></textarea>
       <input id="c_site" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0"><p class="err" id="err" role="alert"></p>
     </div>
+    <p class="info" id="lgpd">Usamos seus dados só para entregar o pedido. Veja a <a href="privacidade.html" target="_blank" rel="noopener">Política de Privacidade</a> e os <a href="termos.html" target="_blank" rel="noopener">Termos de venda</a>.</p>
     <button class="send" id="fin"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.500 4.500L19 7.500"/></svg>Fazer pedido</button>
     <button class="clr" id="lim">Limpar pedido</button>
     <div class="fb" id="fb"></div>
   </aside>
 </div>
-<footer>Aroma e Brilho © 2026 · <a href="admin.html" rel="nofollow">Área do dono</a></footer></div>
+<footer><p>Aroma e Brilho · Responsável: Raquel Silva Magalhães<br>Alameda Girassol, 1027, Vila Velha · WhatsApp (85) 98544-1124</p><p><a href="privacidade.html">Política de Privacidade</a> · <a href="termos.html">Termos de venda</a> · <a href="admin.html" rel="nofollow">Área do dono</a></p></footer></div>
 <div id="ca" hidden><div class="cb" role="dialog" aria-modal="true" aria-label="Minha conta"><button class="cx" id="cax" aria-label="Fechar">×</button><div id="cab"></div></div></div>
 <button id="fab"></button>
 <script>
@@ -497,7 +501,7 @@ function repetir(L){
 let USER=null,MEUS=[];
 const prim=n=>String(n||"").trim().split(" ")[0];
 function fillForm(){["nome","tel","bairro","rua"].forEach(k=>{const el=$("c_"+k);if(el)el.value=cli[k]||""});svc()}
-let AM="entrar",AV={n:"",i:"",p:"",e:""},primeiraAuth=true,PERFIL=null;
+let AM="entrar",AV={n:"",i:"",p:"",e:"",c:false},primeiraAuth=true,PERFIL=null,ACEITE=false,AC_OK=false;
 function onUsuario(u){
   USER=u;MEUS=[];if(!u)PERFIL=null;
   const b=$("acc");b.textContent=u?prim(u.nome)||"Minha conta":"Entrar";b.classList.toggle("on",!!u);
@@ -509,6 +513,10 @@ function onUsuario(u){
 }
 function onPerfil(p){
   PERFIL=p;
+  if(USER&&!(p&&p.aceiteEm)){
+    if(AC_OK){window.salvarPerfil(USER.uid,{aceiteEm:Date.now()}).catch(()=>{});AC_OK=false}
+    else{ACEITE=true;abreCa()}
+  }
   if(!p)return;
   let m=0;for(const k of["nome","tel","bairro","rua"])if(!String(cli[k]||"").trim()&&p[k]){cli[k]=p[k];m=1}
   if(m)fillForm();
@@ -517,12 +525,20 @@ function lgView(){
   $("lg").innerHTML=USER?"":`<div class="lgb"><div><b>Tem conta?</b><span>Entre e deixe seus dados e pedidos salvos.</span></div><button onclick="abreCa()">Entrar</button></div>`;
 }
 function abreCa(){accView();$("ca").hidden=false;document.body.style.overflow="hidden"}
-function fechaCa(){$("ca").hidden=true;document.body.style.overflow=""}
+function fechaCa(){if(ACEITE)return;$("ca").hidden=true;document.body.style.overflow=""}
 $("acc").onclick=abreCa;$("cax").onclick=fechaCa;$("ca").onclick=e=>{if(e.target.id==="ca")fechaCa()};
 addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("ca").hidden)fechaCa()});
 const GLOGO='<svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.500c3.500 0 6.600 1.200 9.100 3.600l6.800-6.800C35.800 2.400 30.300 0 24 0 14.600 0 6.500 5.400 2.600 13.200l7.900 6.100C12.400 13.600 17.700 9.500 24 9.500z"/><path fill="#4285F4" d="M46.500 24.500c0-1.600-.1-3.100-.4-4.500H24v9h12.700c-.6 3-2.300 5.500-4.800 7.200l7.600 5.900c4.400-4.100 7-10.100 7-17.600z"/><path fill="#FBBC05" d="M10.500 28.700A14.500 14.500 0 0 1 9.500 24c0-1.600.3-3.200.8-4.700l-7.900-6.100A24 24 0 0 0 0 24c0 3.900.9 7.500 2.600 10.800l7.900-6.100z"/><path fill="#34A853" d="M24 48c6.500 0 11.900-2.100 15.900-5.800l-7.600-5.900c-2.100 1.400-4.900 2.300-8.300 2.300-6.300 0-11.600-4.100-13.500-9.800l-7.900 6.100C6.500 42.600 14.600 48 24 48z"/></svg>';
 function accView(){
   const el=$("cab");if(!el)return;
+  $("cax").hidden=!!(USER&&ACEITE);
+  if(USER&&ACEITE){
+    el.innerHTML=`<img class="clg" src="logo.png" alt="Aroma e Brilho"><h2>Falta só um passo</h2><p class="info">Para criar a sua conta, leia e concorde com a Política de Privacidade e os Termos de venda.</p>
+    <label class="ck"><input type="checkbox" id="ag" onchange="$('agb').disabled=!this.checked"><span>Li e concordo com a <a href="privacidade.html" target="_blank" rel="noopener">Política de Privacidade</a> e os <a href="termos.html" target="_blank" rel="noopener">Termos de venda</a>.</span></label>
+    <button class="send" id="agb" disabled onclick="aceitaGate()">Continuar</button>
+    <button class="clr" onclick="recusaGate()">Cancelar e não criar conta</button>`;
+    return;
+  }
   if(!USER){
     const cr=AM==="criar",tel=!!AV.i.trim()&&!ehEmail(AV.i);
     el.innerHTML=`<img class="clg" src="logo.png" alt="Aroma e Brilho"><h2>${cr?"Criar sua conta":"Entrar na sua conta"}</h2>
@@ -533,6 +549,7 @@ function accView(){
       <input id="ap" type="password" placeholder="${cr?"Crie uma senha (mínimo 6 caracteres)":"Sua senha"}" autocomplete="${cr?"new-password":"current-password"}" value="${esc(AV.p)}">
       <p class="err" id="caerr" role="alert"></p>
       <button class="send" id="asb" type="submit">${cr?"Criar conta":"Entrar"}</button>
+      ${cr?`<label class="ck"><input type="checkbox" id="ac" ${AV.c?"checked":""}><span>Li e concordo com a <a href="privacidade.html" target="_blank" rel="noopener">Política de Privacidade</a> e os <a href="termos.html" target="_blank" rel="noopener">Termos de venda</a>.</span></label>`:""}
     </form>
     ${cr?"":`<button class="clr" onclick="esqueci()">Esqueci minha senha</button>`}
     <div class="ou">ou</div>
@@ -551,12 +568,13 @@ function accView(){
   ${USER.tel?`<h3>Gmail de contato</h3><p class="info">Opcional. Usamos só para falar com você e ajudar a recuperar o acesso.</p><div class="ce"><input id="ce" type="email" placeholder="seu@gmail.com" value="${esc((PERFIL&&PERFIL.email)||"")}"><button onclick="salvaEmail()">Salvar</button></div>`:""}
   <h3>Meus dados</h3>
   <p class="info">${esc(cli.nome||"Sem nome")}${cli.tel?" · "+esc(cli.tel):""}${cli.rua?" · "+esc(cli.rua):""}${cli.bairro?", "+esc(cli.bairro):""}. Salvamos e atualizamos quando você faz um pedido.</p>
-  <button class="rm" onclick="apagaPerfil()">Apagar meus dados salvos</button>
+  <div class="dir"><button class="rm" onclick="baixaDados()">Baixar meus dados</button><button class="rm" onclick="apagaPerfil()">Apagar meus dados salvos</button><button class="rm" onclick="excluiConta()">Excluir minha conta</button></div>
+  <p class="info" style="text-align:center"><a href="privacidade.html" target="_blank" rel="noopener">Política de Privacidade</a></p>
   <button class="clr" onclick="sairConta()">Sair da conta</button>`;
   el._L=L;
 }
 
-function saveAF(){const g=id=>$(id)?$(id).value:null;const n=g("an"),i=g("ai"),p=g("ap"),e=g("ae");if(e!==null)AV.e=e;if(n!==null)AV.n=n;if(i!==null)AV.i=i;if(p!==null)AV.p=p}
+function saveAF(){const g=id=>$(id)?$(id).value:null;const n=g("an"),i=g("ai"),p=g("ap"),e=g("ae");if(e!==null)AV.e=e;if($("ac"))AV.c=$("ac").checked;if(n!==null)AV.n=n;if(i!==null)AV.i=i;if(p!==null)AV.p=p}
 function setAM(m){saveAF();AM=m;accView()}
 const ehEmail=v=>/[a-zA-Z@]/.test(v);
 function fmtTel(raw){
@@ -585,11 +603,12 @@ async function enviaAuth(ev){
   const ce=AV.e.trim().toLowerCase();if(cr&&tel&&ce&&!/^\S+@\S+\.\S+$/.test(ce))return e("O Gmail de contato está inválido. Corrija ou deixe em branco.");
   if(cr&&!AV.n.trim())return e("Informe o seu nome.");
   if(AV.p.length<6)return e("A senha precisa ter pelo menos 6 caracteres.");
+  if(cr&&!AV.c)return e("Marque a caixa para concordar com a Política de Privacidade e os Termos de venda.");
   b.disabled=true;e("");
   try{
-    if(cr){const c=await window.criarConta(id,AV.p,AV.n.trim().slice(0,80));if(tel&&ce)window.salvarPerfil(c.user.uid,{email:ce}).catch(()=>{})}else await window.entrarEmail(id,AV.p);
-    AV={n:"",i:"",p:"",e:""};fechaCa();toast(cr?"Conta criada":"Você entrou");
-  }catch(x){b.disabled=false;e(AEMAIL[x&&x.code]||"Não foi possível entrar agora. Tente de novo.")}
+    if(cr){AC_OK=true;const c=await window.criarConta(id,AV.p,AV.n.trim().slice(0,80));window.salvarPerfil(c.user.uid,Object.assign({aceiteEm:Date.now()},tel&&ce?{email:ce}:{})).catch(()=>{});AC_OK=false}else await window.entrarEmail(id,AV.p);
+    AV={n:"",i:"",p:"",e:"",c:false};fechaCa();toast(cr?"Conta criada":"Você entrou");
+  }catch(x){AC_OK=false;b.disabled=false;e(AEMAIL[x&&x.code]||"Não foi possível entrar agora. Tente de novo.")}
   return false;
 }
 async function salvaEmail(){
@@ -612,13 +631,31 @@ async function esqueci(){
 }
 async function entrar(){
   const b=$("ggb");if(b)b.disabled=true;
-  try{await window.entrarGoogle();fechaCa();toast("Você entrou")}
+  saveAF();AC_OK=AM==="criar"&&!!AV.c;
+  try{await window.entrarGoogle();if(!ACEITE){fechaCa();toast("Você entrou")}}
   catch(e){
     const m=$("caerr");if(b)b.disabled=false;
     if(m)m.textContent=e&&e.code==="auth/unauthorized-domain"?"Este endereço do site ainda não foi autorizado no Firebase (Authentication, Configurações, Domínios autorizados).":e&&e.code==="auth/operation-not-allowed"?"O login com Google ainda não foi ativado no Firebase.":"Não foi possível entrar agora. Tente de novo."
   }
 }
 function sairConta(){window.sair();fechaCa();toast("Você saiu")}
+function aceitaGate(){
+  if(!$("ag")||!$("ag").checked||!USER)return;
+  window.salvarPerfil(USER.uid,{aceiteEm:Date.now()}).then(()=>{ACEITE=false;fechaCa();toast("Conta criada");accView()}).catch(()=>toast("Não foi possível continuar agora"));
+}
+async function recusaGate(){
+  try{await window.excluirConta()}catch(e){try{await window.sair()}catch(x){}}
+  ACEITE=false;fechaCa();toast("Conta não criada");
+}
+function baixaDados(){
+  const d={conta:{nome:USER.nome,email:USER.email,telefone:USER.tel},perfil:PERFIL||{},dados_locais:cli,pedidos:(MEUS||[]).map(o=>({codigo:o.codigo,data:new Date(o.criadoEm).toISOString(),status:o.status,total:o.total,pagamento:o.pag,entrega:o.entrega,itens:o.itens}))};
+  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(d,null,2)],{type:"application/json"}));a.download="meus-dados-aroma-e-brilho.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+}
+async function excluiConta(){
+  if(!USER||!confirm("Excluir sua conta? Seu perfil salvo e o login serão apagados. Os pedidos já feitos continuam guardados pela loja pelo prazo da Política de Privacidade."))return;
+  try{await window.excluirConta();cli.nome=cli.tel=cli.bairro=cli.rua="";fillForm();fechaCa();toast("Conta excluída")}
+  catch(e){toast(e&&e.code==="auth/requires-recent-login"?"Por segurança, saia, entre de novo e tente excluir outra vez":"Não foi possível excluir agora")}
+}
 async function apagaPerfil(){
   if(!USER||!confirm("Apagar seus dados salvos (nome, WhatsApp e endereço)? Os pedidos já feitos continuam no histórico da loja."))return;
   try{await window.apagarPerfil(USER.uid);cli.tel=cli.bairro=cli.rua="";fillForm();accView();toast("Dados apagados")}catch(e){toast("Não foi possível apagar agora")}
@@ -817,8 +854,8 @@ if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWor
 </script>
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-import {getFirestore,collection,doc,onSnapshot,addDoc,updateDoc,setDoc,deleteDoc,getDoc,getDocs,query,where,limit} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
-import {getAuth,GoogleAuthProvider,signInWithPopup,signInWithRedirect,onAuthStateChanged,signOut,createUserWithEmailAndPassword,signInWithEmailAndPassword,updateProfile,sendPasswordResetEmail} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import {getFirestore,collection,doc,onSnapshot,addDoc,updateDoc,setDoc,deleteDoc,getDoc,getDocs,query,where,limit,Timestamp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+import {getAuth,GoogleAuthProvider,signInWithPopup,signInWithRedirect,onAuthStateChanged,signOut,deleteUser,createUserWithEmailAndPassword,signInWithEmailAndPassword,updateProfile,sendPasswordResetEmail} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 const app=initializeApp({apiKey:"AIzaSyCGFv2xrJveqk4gR_OeRCqj1aJVT_atEQ8",authDomain:"aroma-e-brilho.firebaseapp.com",projectId:"aroma-e-brilho",storageBucket:"aroma-e-brilho.firebasestorage.app",messagingSenderId:"674882407782",appId:"1:674882407782:web:a6727100592d3813310ca7"});
 const RECAPTCHA_SITE_KEY="";
 if(RECAPTCHA_SITE_KEY){const m=await import("https://www.gstatic.com/firebasejs/10.14.1/firebase-app-check.js");m.initializeAppCheck(app,{provider:new m.ReCaptchaV3Provider(RECAPTCHA_SITE_KEY),isTokenAutoRefreshEnabled:true})}
@@ -827,7 +864,7 @@ let prods=[],loja={},pronto=false;
 const push=()=>{if(pronto)window.setDados({loja,cats:[...new Set(prods.map(p=>p.cat))],produtos:prods})};
 onSnapshot(collection(db,"produtos"),s=>{pronto=true;prods=s.docs.map(d=>d.data()).sort((a,b)=>(a.ordem||a.id)-(b.ordem||b.id));push()});
 onSnapshot(doc(db,"config","loja"),s=>{loja=s.data()||{};push()});
-window.enviarPedido=async o=>(await addDoc(collection(db,"pedidos"),o)).id;
+window.enviarPedido=async o=>(await addDoc(collection(db,"pedidos"),{...o,expiraEm:Timestamp.fromMillis(Date.now()+1826*864e5)})).id;
 let unT=null;
 window.avaliarPedido=(id,n,c)=>updateDoc(doc(db,"pedidos",id),{nota:n,comentario:String(c||"").trim().slice(0,200)});
 onSnapshot(doc(db,"config","destaques"),s=>window.setDest((s.data()||{}).ids||[]),()=>{});
@@ -835,7 +872,8 @@ window.acompanhar=(id,cb)=>{unT&&unT();unT=onSnapshot(doc(db,"pedidos",id),s=>cb
 const auth=getAuth(app),gp=new GoogleAuthProvider();
 window.entrarGoogle=async()=>{try{await signInWithPopup(auth,gp)}catch(e){if(e.code==="auth/popup-blocked"){await signInWithRedirect(auth,gp);return}if(e.code==="auth/popup-closed-by-user"||e.code==="auth/cancelled-popup-request")return;throw e}};
 window.sair=()=>signOut(auth);
-window.salvarPerfil=(uid,d)=>setDoc(doc(db,"clientes",uid),{...d,atualizadoEm:Date.now()},{merge:true});
+window.salvarPerfil=(uid,d)=>setDoc(doc(db,"clientes",uid),{...d,atualizadoEm:Date.now(),expiraEm:Timestamp.fromMillis(Date.now()+730*864e5)},{merge:true})
+window.excluirConta=async()=>{const u=auth.currentUser;await deleteDoc(doc(db,"clientes",u.uid));await deleteUser(u)};
 window.apagarPerfil=uid=>deleteDoc(doc(db,"clientes",uid));
 window.meusPedidos=async uid=>(await getDocs(query(collection(db,"pedidos"),where("uid","==",uid),limit(50)))).docs.map(d=>({id:d.id,...d.data()}));
 const emite=u=>{const e=u.email||"",ph=/@fone\.example\.com$/.test(e);window.onUsuario({uid:u.uid,nome:u.displayName||"",email:ph?"":e,tel:ph?e.split("@")[0]:"",foto:u.photoURL||"",tipo:ph?"tel":u.providerData.some(p=>p.providerId==="google.com")?"google":"email"})};
