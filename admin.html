@@ -302,7 +302,7 @@ input[type=checkbox]:checked{background:var(--azul)}input[type=checkbox]:checked
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import {getAuth,signInWithEmailAndPassword,signOut,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-import {getFirestore,collection,doc,onSnapshot,setDoc,deleteDoc,updateDoc,query,orderBy,limit} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+import {getFirestore,collection,doc,onSnapshot,setDoc,deleteDoc,updateDoc,query,orderBy,limit,where,getDocs,Timestamp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 const app=initializeApp({apiKey:"AIzaSyCGFv2xrJveqk4gR_OeRCqj1aJVT_atEQ8",authDomain:"aroma-e-brilho.firebaseapp.com",projectId:"aroma-e-brilho",storageBucket:"aroma-e-brilho.firebasestorage.app",messagingSenderId:"674882407782",appId:"1:674882407782:web:a6727100592d3813310ca7"});
 const auth=getAuth(app),db=getFirestore(app);
 const $=id=>document.getElementById(id);
@@ -383,7 +383,7 @@ function produtosView(){
 const norm=s=>String(s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim();
 let per=7;
 function vendasView(){
-  $("mn").innerHTML=`<div class="seg2" id="pr"><button data-d="1">Hoje</button><button data-d="7">7 dias</button><button data-d="30">30 dias</button></div><div class="row" style="margin-bottom:12px"><button class="ghost" onclick="exportar()">Baixar planilha deste período</button></div><div id="rv"></div>`;
+  $("mn").innerHTML=`<div class="seg2" id="pr"><button data-d="1">Hoje</button><button data-d="7">7 dias</button><button data-d="30">30 dias</button></div><div class="row" style="margin-bottom:12px"><button class="ghost" onclick="exportar()">Baixar planilha deste período</button><button class="ghost" onclick="limpar()">Limpar dados antigos</button></div><div id="rv"></div>`;
   document.querySelectorAll("#pr button").forEach(b=>{b.classList.toggle("on",+b.dataset.d===per);b.onclick=()=>{per=+b.dataset.d;vendasView()}});
   relat();
 }
@@ -499,6 +499,17 @@ async function foto(i,el){
   }catch(e){msg("Não consegui usar essa imagem. Tente outra foto.",1)}
 }
 const inicioPer=()=>{const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()-(per-1));return d.getTime()};
+async function limpar(){
+  try{
+    const agora=Timestamp.now();
+    const [p,c]=await Promise.all([getDocs(query(collection(db,"pedidos"),where("expiraEm","<=",agora),limit(500))),getDocs(query(collection(db,"clientes"),where("expiraEm","<=",agora),limit(500)))]);
+    const n=p.size+c.size;
+    if(!n){msg("Nada vencido para apagar");return}
+    if(!confirm("Apagar "+p.size+" pedido(s) com mais de 5 anos e "+c.size+" perfil(is) de cliente com mais de 2 anos sem pedidos?\n\nIsso não pode ser desfeito. Baixe a planilha antes se quiser guardar.")){return}
+    await Promise.all([...p.docs,...c.docs].map(d=>deleteDoc(d.ref)));
+    msg(n+" registro(s) apagado(s)")
+  }catch(e){erro(e)}
+}
 function exportar(){
   const L=pedidos.filter(o=>o.criadoEm>=inicioPer()).sort((a,b)=>a.criadoEm-b.criadoEm);
   const q=v=>'"'+String(v==null?"":v).replace(/"/g,'""')+'"',n=v=>Number(v||0).toFixed(2).replace(".",",");
@@ -557,7 +568,7 @@ async function mudarStatus(id,st){
   }catch(e){erro(e)}
 }
 Object.assign(window,{
-  imprimir,foto,
+  imprimir,foto,limpar,
   setTaxa:v=>{loja.taxa=Math.max(0,parseFloat(v)||0);setDoc(doc(db,"config","loja"),loja).then(()=>msg("Taxa salva")).catch(erro)},
   setH:(d,k,v)=>{loja.horarios=loja.horarios||{};const h=loja.horarios[d]=loja.horarios[d]||{on:false,a:"08:00",f:"18:00"};h[k]=v;setDoc(doc(db,"config","loja"),loja).then(()=>msg("Horário salvo")).catch(erro)},
   setAba:k=>{aba=k;mostrar()},setBairros:v=>{loja.bairros=v.split("\n").map(x=>x.trim()).filter(Boolean);setDoc(doc(db,"config","loja"),loja).then(()=>msg("Bairros salvos")).catch(erro)},setFP:k=>{fp=k;listaPed()},mudarStatus,
