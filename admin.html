@@ -175,6 +175,11 @@ input[type=checkbox]:checked{background:var(--azul)}input[type=checkbox]:checked
 .bars div:hover i{filter:brightness(1.12)}
 .bars small{font-size:.66rem;color:var(--mut);margin-top:5px;white-space:nowrap;overflow:hidden;font-weight:600}
 @keyframes growy{from{transform:scaleY(0)}}
+.pr.lw{border-color:var(--warn);box-shadow:0 0 0 3px rgba(168,100,0,.16),var(--sh)}.pr.ou{border-color:var(--red);box-shadow:0 0 0 3px rgba(201,54,59,.14),var(--sh)}
+.lwb{display:inline-block;margin-bottom:8px;padding:4px 11px;border-radius:99px;background:#fff1d6;color:var(--warn);font-size:.78rem;font-weight:800}.lwb.ou{background:#ffe9e6;color:var(--red)}
+.mg{grid-column:2/-1;font-size:.82rem;color:var(--mut);font-weight:600;align-self:center}.mg .neg{color:var(--red)}
+.avx{grid-column:1/-1;display:grid;gap:6px}.avr{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:.88rem;padding:6px 0;border-top:1px solid var(--bd)}.avr span{flex:1 1 140px}
+.agd{margin:0 0 8px;padding:6px 10px;border-radius:10px;background:#e3f2ff;color:#0f4a60;font-weight:700;font-size:.88rem}
 .rk{display:grid;grid-template-columns:1fr auto;gap:3px 10px;margin-bottom:11px;font-size:.92rem;font-weight:500}
 .rk u{grid-column:1/-1;height:7px;border-radius:99px;background:var(--bg);text-decoration:none;overflow:hidden}.rk u i{display:block;height:100%;background:linear-gradient(90deg,var(--lim),#f7dc8e);border-radius:99px;transform-origin:left;animation:fillx .9s var(--ease) backwards}
 .rk span:last-child{color:var(--mut);font-weight:600}
@@ -304,13 +309,17 @@ import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase
 import {getAuth,signInWithEmailAndPassword,signOut,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 import {getFirestore,collection,doc,onSnapshot,setDoc,deleteDoc,updateDoc,query,orderBy,limit,where,getDocs,Timestamp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 const app=initializeApp({apiKey:"AIzaSyCGFv2xrJveqk4gR_OeRCqj1aJVT_atEQ8",authDomain:"aroma-e-brilho.firebaseapp.com",projectId:"aroma-e-brilho",storageBucket:"aroma-e-brilho.firebasestorage.app",messagingSenderId:"674882407782",appId:"1:674882407782:web:a6727100592d3813310ca7"});
+const RECAPTCHA_SITE_KEY="";
+if(RECAPTCHA_SITE_KEY){const m=await import("https://www.gstatic.com/firebasejs/10.14.1/firebase-app-check.js");m.initializeAppCheck(app,{provider:new m.ReCaptchaV3Provider(RECAPTCHA_SITE_KEY),isTokenAutoRefreshEnabled:true})}
 const auth=getAuth(app),db=getFirestore(app);
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-let prods=[],loja={end:"",hor:""},unsubs=[],lastKey="",filtro="todos",busca="",pedidos=[],aba="pedidos",fp="novo",primeira=true,som=true,actx=null;
+let custos={},avisos=[],prods=[],loja={end:"",hor:""},unsubs=[],lastKey="",filtro="todos",busca="",pedidos=[],aba="pedidos",fp="novo",primeira=true,som=true,actx=null;
 const brl=v=>Number(v).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
 document.addEventListener("click",()=>{try{actx=actx||new AudioContext();actx.resume()}catch(e){}});
 const e0=v=>Math.max(0,parseInt(v.e)||0);
+const fmtAg=s=>{const[d,t]=String(s).split("|"),m=d.match(/^(\d{4})-(\d{2})-(\d{2})$/);if(!m)return String(s);const dt=new Date(+m[1],+m[2]-1,+m[3]);return dt.toLocaleDateString("pt-BR",{weekday:"long",day:"2-digit",month:"2-digit"})+(t?", "+t.toLowerCase():"")};
+
 const SEED=[["🧴","Alvejante","Líquidos",[["5L",12]]],["🧼","Sabão","Líquidos",[["5L",10]]],["🌸","Amaciante","Líquidos",[["5L",10]]],["🍽️","Detergente","Líquidos",[["5L",10]]],["💧","Água sanitária","Líquidos",[["5L",8]]],["✨","Desinfetante","Líquidos",[["1L",3.5],["2L",5]]],["🗑️","Pá","Utensílios",[["",6]]],["🧹","Vassoura","Utensílios",[["",8]]],["🪣","Rodo","Utensílios",[["30cm",6],["40cm",8]]]];
 
 function msg(t,bad,ms){const s=$("st");s.textContent=t;s.classList.toggle("bad",!!bad);s.classList.add("on");clearTimeout(s._t);s._t=setTimeout(()=>s.classList.remove("on"),ms||1800)}
@@ -330,11 +339,17 @@ function stats(){if(!$("stats"))return;
   const S=[["todos",n,"Produtos"],["baixo",low,"Estoque baixo"],["esgotado",out,"Com esgotado"]];
   $("stats").innerHTML=S.map(([k,v,t])=>`<button class="stat ${filtro===k?"on":""}" onclick="setF('${k}')"><span class="big">${v}</span><span>${t}</span></button>`).join("");
 }
+const mgTxt=(p,j)=>{const c=custos[p.id+"|"+j],v=p.vars[j];if(c==null||c==="")return"Informe o custo para ver o lucro.";const l=(+v.p||0)-c,pc=v.p?l/v.p*100:0;return `Lucro: <b class="${l<0?"neg":""}">${brl(l)}</b> por unidade (${pc.toFixed(0)}%)`};
+const avBox=(p,j)=>{const L=avisos.filter(x=>String(x.pid)===String(p.id)&&+x.vi===j);if(!L.length)return"";const e=e0(p.vars[j]),k=p.id+"_"+j;
+  const nome=(p.nome+" "+(p.vars[j].t||"")).trim();
+  const rows=L.map(x=>{const t=String(x.tel||"").replace(/\D/g,""),w="https://wa.me/"+(t.length<=11?"55":"")+t+"?text="+encodeURIComponent("Olá"+(x.nome?", "+String(x.nome).split(" ")[0]:"")+"! O produto "+nome+" voltou ao estoque na Aroma e Brilho."+(loja.site?" "+loja.site:""));
+    return `<div class="avr"><span>${esc(x.nome||"Cliente")} · ${esc(x.tel)}</span><a class="ghost" target="_blank" rel="noopener" href="${w}">Avisar</a><button class="del" onclick="feitoAv('${x.id}')">Feito</button></div>`}).join("");
+  return `<div class="avx">${e>0?`<button class="ghost" onclick="$('avl_${k}').hidden=!$('avl_${k}').hidden">Voltou ao estoque: avisar ${L.length} ${L.length>1?"clientes":"cliente"}</button>`:`<p class="nt" style="margin:0">${L.length} ${L.length>1?"clientes esperando":"cliente esperando"} a reposição.</p>`}<div id="avl_${k}" hidden>${rows}</div></div>`};
 function lista(){if(!$("lista"))return;
   const q=busca.trim().toLowerCase();
   const ok=p=>p.nome.toLowerCase().includes(q)&&(filtro==="todos"||(filtro==="esgotado"&&p.vars.some(v=>e0(v)<=0))||(filtro==="baixo"&&p.vars.some(v=>e0(v)>0&&e0(v)<=5)));
   const cats=[...new Set(prods.map(p=>p.cat))];
-  const h=prods.map((p,i)=>ok(p)?`<div class="pr"><div class="hd">
+  const h=prods.map((p,i)=>ok(p)?`<div class="pr ${p.vars.some(v=>e0(v)<=0)?"ou":p.vars.some(v=>e0(v)<=5)?"lw":""}">${p.vars.some(v=>e0(v)<=0)?`<div class="lwb ou">Esgotado: reponha</div>`:p.vars.some(v=>e0(v)<=5)?`<div class="lwb">Estoque baixo</div>`:""}<div class="hd">
     <label class="fotob" title="Trocar a foto">${p.foto?`<img src="${esc(p.foto)}" alt="Foto de ${esc(p.nome)}">`:`<span>Adicionar foto</span>`}<input type="file" accept="image/*" hidden onchange="foto(${i},this)"></label>${p.foto?`<button class="del" onclick="setP(${i},'foto','');lista()">Tirar foto</button>`:""}
     <input class="nm" value="${esc(p.nome)}" aria-label="Nome" onchange="setP(${i},'nome',this.value)">
     <input class="ct" list="cats" placeholder="Categoria" value="${esc(p.cat)}" aria-label="Categoria" onchange="setP(${i},'cat',this.value)"></div>
@@ -342,7 +357,8 @@ function lista(){if(!$("lista"))return;
       <div><label>Tamanho</label><input value="${esc(v.t)}" placeholder="Ex.: 5L" onchange="setV(${i},${j},'t',this.value)"></div>
       <div><label>Preço</label><div class="pre"><span>R$</span><input type="number" step="0.01" min="0" value="${v.p}" onchange="setV(${i},${j},'p',this.value)"></div></div>
       <div><label>Estoque</label><div class="stk"><button aria-label="Diminuir" onclick="step(${i},${j},-1)">−</button><input id="e_${i}_${j}" type="number" min="0" value="${e}" onchange="setV(${i},${j},'e',this.value)"><button aria-label="Aumentar" onclick="step(${i},${j},1)">+</button></div></div>
-      <div class="tg"><span id="s_${i}_${j}"><i class="dot ${c}"></i>${e<=0?"Esgotado":e<=5?"Estoque baixo":"Em estoque"}</span>${p.vars.length>1?`<button class="del" onclick="delV(${i},${j})">Remover tamanho</button>`:""}</div></div>`}).join("")}</div>
+      <div><label>Custo</label><div class="pre"><span>R$</span><input type="number" step="0.01" min="0" placeholder="0,00" value="${custos[p.id+"|"+j]??""}" onchange="setCusto(${i},${j},this.value)"></div></div><div class="mg" id="m_${i}_${j}">${mgTxt(p,j)}</div>
+      <div class="tg"><span id="s_${i}_${j}"><i class="dot ${c}"></i>${e<=0?"Esgotado":e<=5?"Estoque baixo":"Em estoque"}</span>${p.vars.length>1?`<button class="del" onclick="delV(${i},${j})">Remover tamanho</button>`:""}</div>${avBox(p,j)}</div>`}).join("")}</div>
     <div class="hd add"><button class="ghost" onclick="addV(${i})">Adicionar tamanho</button><button class="del" style="margin-left:auto" onclick="remover(${i})">Remover produto</button></div></div>`:"").join("");
   $("lista").innerHTML=(h.trim()?h:prods.length?`<div class="empty"><h2>Nada encontrado</h2>Mude a busca ou o filtro acima.</div>`:`<div class="empty"><h2>Nenhum produto ainda</h2><p>Comece com os produtos que já combinamos ou crie o primeiro.</p><button class="btn" onclick="importar()">Importar produtos iniciais</button></div>`)+`<datalist id="cats">${cats.map(c=>`<option value="${esc(c)}">`).join("")}</datalist>`;
   stats();
@@ -396,7 +412,10 @@ function relat(){
   v.forEach(o=>{const d=new Date(o.criadoEm);d.setHours(0,0,0,0);const x=dias.find(y=>y.d.getTime()===d.getTime());if(x)x.t+=o.total||0});
   const mx=Math.max(1,...dias.map(x=>x.t));
   const agr=(f)=>{const m={};v.forEach(o=>f(o).forEach(([k,q,val])=>{m[k]=m[k]||{q:0,val:0};m[k].q+=q;m[k].val+=val}));return Object.entries(m).sort((a,b)=>b[1].q-a[1].q).slice(0,6)};
-  const prod=agr(o=>(o.itens||[]).map(i=>[i.nome,i.q,i.q*i.p]));
+  const vp={};v.forEach(o=>(o.itens||[]).forEach(i=>{const k=i.pid+"|"+i.vi,x=vp[k]=vp[k]||{q:0,val:0,luc:0,sc:0};x.q+=i.q;x.val+=i.q*i.p;const c=custos[k];if(c!=null)x.luc+=i.q*(i.p-c);else x.sc+=i.q}));
+  const PL=[];prods.forEach(p=>p.vars.forEach((x,j)=>{const k=p.id+"|"+j;PL.push({n:(p.nome+" "+(x.t||"")).trim(),c:custos[k]!=null,...(vp[k]||{q:0,val:0,luc:0,sc:0})})}));
+  PL.sort((x,y)=>y.q-x.q||x.n.localeCompare(y.n));const vend=PL.filter(x=>x.q>0),zero=PL.filter(x=>!x.q),mxq=vend.length?vend[0].q:1;
+  const lucT=PL.reduce((s,x)=>s+x.luc,0),semC=PL.reduce((s,x)=>s+x.sc,0),temC=PL.some(x=>x.c&&x.q>0);
   const bai=agr(o=>[[(o.cliente||{}).bairro||"Sem bairro",1,o.total||0]]);
   const rk=(l,u)=>l.length?l.map(([k,x])=>`<div class="rk"><span>${esc(k)}</span><span>${u(x)}</span><u><i style="width:${Math.round(x.q/l[0][1].q*100)}%"></i></u></div>`).join(""):`<p class="nt">Sem vendas neste período.</p>`;
   const din=v.filter(o=>o.pag==="Dinheiro").length;
@@ -405,7 +424,8 @@ function relat(){
   $("rv").innerHTML=`<div class="kp"><div><b>${brl(tot)}</b><span>Vendido</span></div><div><b>${n}</b><span>${n===1?"Pedido":"Pedidos"}</span></div><div><b>${brl(n?tot/n:0)}</b><span>Ticket médio</span></div></div>
   <p class="nt">Contam os pedidos confirmados, a caminho e entregues. Novos e cancelados ficam de fora.${pedidos.length>=400?" Mostrando só os últimos 400 pedidos.":""}</p>
   ${per>1?`<div class="bx"><h3>Vendas por dia</h3><div class="bars">${dias.map((x,n)=>`<div title="${x.d.toLocaleDateString("pt-BR")}: ${brl(x.t)}"><i style="--n:${n};height:${Math.round(x.t/mx*100)}%"></i><small>${per<=7?x.d.toLocaleDateString("pt-BR",{weekday:"short"}).replace(".",""):(x.d.getDate()%5===0?x.d.getDate():"")}</small></div>`).join("")}</div></div>`:""}
-  <div class="bx"><h3>Mais vendidos</h3>${rk(prod,x=>x.q+" un. · "+brl(x.val))}</div>
+  ${temC?`<div class="bx"><h3>Lucro estimado</h3><p style="margin:0"><b style="font-size:1.3rem">${brl(lucT)}</b></p><p class="nt" style="margin:4px 0 0">Usa o custo que você informou em cada produto.${semC?" "+semC+" un. vendidas sem custo informado ficaram de fora.":""}</p></div>`:""}
+  <div class="bx"><h3>Vendas por produto</h3>${vend.length?vend.map(x=>`<div class="rk"><span>${esc(x.n)}</span><span>${x.q} un. · ${brl(x.val)}${x.c?" · lucro "+brl(x.luc):""}</span><u><i style="width:${Math.round(x.q/mxq*100)}%"></i></u></div>`).join(""):`<p class="nt">Sem vendas neste período.</p>`}${zero.length?`<h3 style="margin-top:14px">Não vendeu neste período</h3><p class="nt" style="margin:0">${zero.map(x=>esc(x.n)).join(", ")}</p>`:""}</div>
   <div class="bx"><h3>Bairros que mais pedem</h3>${rk(bai,x=>x.q+(x.q===1?" pedido":" pedidos"))}</div>
   <div class="bx"><h3>Pagamento</h3><p style="margin:0">Dinheiro: <b>${din}</b> &nbsp; Pix: <b>${n-din}</b></p></div>
   <div class="bx"><h3>Avaliações dos clientes</h3>${av.length?`<p style="margin:0 0 8px"><b>${media.toFixed(1).replace(".",",")} de 5</b> em ${av.length} ${av.length>1?"avaliações":"avaliação"}</p>`+av.filter(o=>o.comentario).slice(0,5).map(o=>`<p class="nt" style="margin:0 0 6px">${"★".repeat(o.nota)} ${esc(o.comentario)} - ${esc((o.cliente||{}).nome)}</p>`).join(""):`<p class="nt">Ainda sem avaliações neste período.</p>`}</div>
@@ -439,7 +459,7 @@ function card(o){
     entregue:["Agradecer e pedir avaliação",`Olá, ${nm}! Obrigado pela compra na Aroma e Brilho. Se puder, avalie o seu pedido pelo site${st?":"+st:"."} Foi um prazer atender você!`]}[o.status];
   const B={novo:[["confirmado","Confirmar pedido"]],confirmado:[["entrega","Saiu para entrega"]],entrega:[["entregue","Marcar como entregue"]]}[o.status]||[];
   return `<article class="od st_${o.status} ${o.status==="novo"?"nv":""}" data-id="${esc(o.id)}"><div class="oh"><h3>Pedido ${esc(o.codigo)}</h3><span class="bg s_${o.status}">${ST[o.status]}</span><time>${h}</time></div>
-  <p class="cl"><b>${esc(c.nome)}</b><br>${esc(c.bairro)}, ${esc(c.rua)}</p>${o.entrega?`<p class="fora">Bairro fora da lista: taxa de entrega de ${brl(o.entrega)} somada ao total.</p>`:fora?`<p class="fora">Bairro fora da lista de entrega grátis. Confirme a entrega com o cliente.</p>`:""}
+  ${o.agendado?`<p class="agd">Agendado para ${esc(fmtAg(o.agendado))}</p>`:""}<p class="cl"><b>${esc(c.nome)}</b><br>${esc(c.bairro)}, ${esc(c.rua)}</p>${o.entrega?`<p class="fora">Bairro fora da lista: taxa de entrega de ${brl(o.entrega)} somada ao total.</p>`:fora?`<p class="fora">Bairro fora da lista de entrega grátis. Confirme a entrega com o cliente.</p>`:""}
   <ul class="oi">${(o.itens||[]).map(i=>`<li><span>${i.q}x ${esc(i.nome)}</span><span>${brl(i.q*i.p)}</span></li>`).join("")}</ul>
   <p class="pgm">${pg}</p>${o.nota?`<p class="pgm">Avaliação: ${"★".repeat(o.nota)}${"☆".repeat(5-o.nota)}${o.comentario?" - "+esc(o.comentario):""}</p>`:""}${o.conta==="tel"?`<p class="ob">Telefone de cadastro não verificado. Confirme pelo WhatsApp antes de entregar.</p>`:""}${o.obs?`<p class="ob">Obs: ${esc(o.obs)}</p>`:""}
   ${o.entrega?`<div class="ot" style="font-size:.9rem;font-weight:500"><span>Entrega</span><span>${brl(o.entrega)}</span></div>`:""}<div class="ot"><span>Total</span><span>${brl(o.total)}</span></div>
@@ -502,11 +522,11 @@ const inicioPer=()=>{const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate(
 async function limpar(){
   try{
     const agora=Timestamp.now();
-    const [p,c]=await Promise.all([getDocs(query(collection(db,"pedidos"),where("expiraEm","<=",agora),limit(500))),getDocs(query(collection(db,"clientes"),where("expiraEm","<=",agora),limit(500)))]);
-    const n=p.size+c.size;
+    const [p,c,av]=await Promise.all([getDocs(query(collection(db,"pedidos"),where("expiraEm","<=",agora),limit(500))),getDocs(query(collection(db,"clientes"),where("expiraEm","<=",agora),limit(500))),getDocs(query(collection(db,"avisos"),where("expiraEm","<=",agora),limit(500)))]);
+    const n=p.size+c.size+av.size;
     if(!n){msg("Nada vencido para apagar");return}
-    if(!confirm("Apagar "+p.size+" pedido(s) com mais de 5 anos e "+c.size+" perfil(is) de cliente com mais de 2 anos sem pedidos?\n\nIsso não pode ser desfeito. Baixe a planilha antes se quiser guardar.")){return}
-    await Promise.all([...p.docs,...c.docs].map(d=>deleteDoc(d.ref)));
+    if(!confirm("Apagar "+p.size+" pedido(s) com mais de 5 anos e "+c.size+" perfil(is) de cliente com mais de 2 anos sem pedidos e "+av.size+" pedido(s) de aviso com mais de 90 dias?\n\nIsso não pode ser desfeito. Baixe a planilha antes se quiser guardar.")){return}
+    await Promise.all([...p.docs,...c.docs,...av.docs].map(d=>deleteDoc(d.ref)));
     msg(n+" registro(s) apagado(s)")
   }catch(e){erro(e)}
 }
@@ -575,7 +595,9 @@ Object.assign(window,{
   setF:k=>{filtro=k;lista()},
   setLoja:(k,v)=>{loja[k]=v;setDoc(doc(db,"config","loja"),loja).then(()=>msg("Alteração salva")).catch(erro)},
   setP:(i,k,v)=>{prods[i][k]=v;save(prods[i]);if(k==="cat")lista()},
-  setV:(i,j,k,v)=>{prods[i].vars[j][k]=k==="t"?v:k==="e"?(parseInt(v)||0):(parseFloat(v)||0);save(prods[i]);if(k==="e")lista()},
+  setV:(i,j,k,v)=>{prods[i].vars[j][k]=k==="t"?v:k==="e"?(parseInt(v)||0):(parseFloat(v)||0);save(prods[i]);if(k==="e")lista();else if(k==="p"){const m=$(`m_${i}_${j}`);if(m)m.innerHTML=mgTxt(prods[i],j)}},
+  setCusto:(i,j,v)=>{const k=prods[i].id+"|"+j;if(String(v).trim()==="")delete custos[k];else custos[k]=Math.max(0,parseFloat(String(v).replace(",","."))||0);setDoc(doc(db,"privado","custos"),custos).then(()=>msg("Custo salvo")).catch(erro);const m=$(`m_${i}_${j}`);if(m)m.innerHTML=mgTxt(prods[i],j)},
+  feitoAv:id=>deleteDoc(doc(db,"avisos",id)).then(()=>msg("Aviso removido")).catch(erro),
   step:(i,j,d)=>{const n=Math.max(0,e0(prods[i].vars[j])+d);prods[i].vars[j].e=n;const el=$(`e_${i}_${j}`);if(el)el.value=n;const s=$(`s_${i}_${j}`);if(s)s.innerHTML=`<i class="dot ${n<=0?"out":n<=5?"low":""}"></i>${n<=0?"Esgotado":n<=5?"Estoque baixo":"Em estoque"}`;stats();save(prods[i])},
   addV:i=>{prods[i].vars.push({t:"",p:0,e:0});save(prods[i]);lista()},
   delV:(i,j)=>{prods[i].vars.splice(j,1);save(prods[i]);lista()},
@@ -609,6 +631,8 @@ onAuthStateChanged(auth,u=>{
     if(key!==lastKey){lastKey=key;lista()}
     if(aba==="vendas")relat();
   }));
+  unsubs.push(ouvir(doc(db,"privado","custos"),s=>{custos=s.data()||{};if(aba==="vendas")relat();if(aba==="produtos")lista()}));
+  unsubs.push(ouvir(collection(db,"avisos"),s=>{const n=avisos.length;avisos=s.docs.map(d=>({id:d.id,...d.data()}));if(aba==="produtos"&&(n!==avisos.length))lista()}));
   unsubs.push(ouvir(doc(db,"config","loja"),s=>{loja={end:"",hor:"",...(s.data()||{})};for(const k of["end","hor"]){const el=$("l_"+k);if(el&&document.activeElement!==el)el.value=loja[k]||""}}));
 });
 </script>
